@@ -1,0 +1,8 @@
+/* @import "~antd/dist/antd.css"; */
+@import './style/custom-antd.css';
+
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}

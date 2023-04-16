@@ -1,0 +1,74 @@
+  const [searchText, setSearchText] = React.useState("");
+  const [searchedColumn, setSearchedColumn] = React.useState("");
+
+  const handleSearch = (selectedKeys: React.Key[], confirm: (param?: FilterConfirmProps | undefined) => void, dataIndex: string) => {
+    confirm();
+    // setSearchText(`${selectedKeys[0]}`);
+    // setSearchedColumn(dataIndex);
+  };
+
+  const handleReset = (clearFilters: (() => void) | undefined) => {
+    if (clearFilters) {
+      clearFilters();
+    }
+    
+    // setSearchText("");
+  };
+
+  const getColumnSearchProps = (
+    dataIndex: string,
+    handleReset: (clearFilters: (() => void) | undefined) => void,
+    handleSearch: (selectedKeys: React.Key[], confirm: (param?: FilterConfirmProps | undefined) => void, dataIndex: string) => void,
+  ) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }: FilterDropdownProps) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          // ref={}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{ marginBottom: 8, display: 'block' }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{ width: 90 }}
+          >
+            Search
+          </Button>
+          <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />,
+    onFilter: (value: any, record: any) =>
+      record[dataIndex]
+        ? record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
+        : '',
+    render: (text: string) => text
+  });
+
+  const columns = [
+    {
+      title: "№",
+      dataIndex: "number",
+      key: "number",
+    },
+    {
+      title: "Наименование дисциплины",
+      dataIndex: "name",
+      key: "name",
+      ...getColumnSearchProps("name", handleReset, handleSearch),
+    },
+    {
+      title: "Количество кредитов",
+      dataIndex: "credits",
+      key: "credits",
+    },
+  ];

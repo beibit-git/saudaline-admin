@@ -1,0 +1,25 @@
+.main-container {
+  /* width: 50%; */
+  /* box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+  /* margin: auto; */
+  /* margin-top: 100px; */
+  padding: 100px 0;
+}
+.logo-container {
+  width: 300px;
+  content: url('http://localhost/static/media/logo-black.2496a132b014dd3006c66cb13eebd443.svg');
+  margin: 25px auto;
+}
+
+.ant-btn span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.form-container {
+  margin-top: 10px;
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  padding: 30px;
+}

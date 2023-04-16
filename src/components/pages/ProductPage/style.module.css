@@ -1,0 +1,15 @@
+.header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.title {
+  margin-right: auto;
+}
+
+.deleteButton:hover, .deleteButton:focus-within {
+  border-color: red;
+}
