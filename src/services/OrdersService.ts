@@ -5,6 +5,7 @@ import { CategoriesDtoResponse } from '../interfaces/Categories/CategoriesDtoRes
 import { CategoryDtoRequest } from '../interfaces/Categories/CategoryDtoRequest';
 import { OrderDtoResponse } from '../interfaces/OrderDtoResponse';
 import { OrdersDtoForAllResponse } from '../interfaces/Orders/OrdersDtoForAllResponse';
+import { OrderDtoShow } from '../interfaces/Orders/OrderShow/OrderDtoShow';
 
 export class OrdersService {
   static baseURL = Constants.API_BASE_URL;
@@ -25,17 +26,17 @@ export class OrdersService {
     });
   }
 
-  static acceptOrder(orderId: number) {
+  static acceptOrder(orderId: number | undefined) {
     return authAxios.post(`/api/v1/orders/accept-order?orderId=${orderId}`);
   }
 
-  static rejectOrder(orderId: number) {
+  static rejectOrder(orderId: number | undefined) {
     return authAxios.post(`/api/v1/orders/reject-order?orderId=${orderId}`);
   }
 
-  // static getOneCategory(categoryId: number) {
-  //   return authAxios.get<CategoriesDtoResponse>(`/api/v1/orders/get-by-id?categoryId=${categoryId}`);
-  // }
+  static getOneOrder(orderId: number) {
+    return authAxios.get<OrderDtoShow>(`/api/v1/orders/get-by-id?orderId=${orderId}`);
+  }
 
   // // status 200
   // static updateCategory(categoryId: number, updatedCategory: CategoryDtoRequest) {

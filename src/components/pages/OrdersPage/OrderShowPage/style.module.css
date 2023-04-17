@@ -1,0 +1,19 @@
+.orderShowHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.orderShowHeader .status {
+  font-size: 12px;
+}
+
+.orderer {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexrow {
+  display: flex;
+  flex-direction: row;
+}

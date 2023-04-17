@@ -16,6 +16,7 @@ import { DateField } from '../../../helpers/DateField';
 const useOrdersPage = () => {
   const [shouldRerender, setShouldRerender] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadings, setLoadings] = useState<boolean[]>([]);
   const [orders, setOrders] = useState<OrdersDtoForAllResponse[]>([]);
   const [categories, setCategories] = useState<CategoriesDtoResponse[]>([]);
   const [subCategories, setSubCategories] = useState<CategoriesDtoResponse[]>([]);
@@ -49,21 +50,45 @@ const useOrdersPage = () => {
   }, [currentPage, searchQuery, selectedCategory, selectedSubCategory, shouldRerender]);
 
   const onAcceptOrder = (orderId: number) => {
+    setLoadings((prevLoadings) => {
+      const newLoadings = [...prevLoadings];
+      newLoadings[0] = true;
+      return newLoadings;
+    });
     OrdersService.acceptOrder(orderId)
       .then(() => {
         openNotification('Заказ принят!', '', 'success', 1.5);
         setShouldRerender(!shouldRerender);
       })
-      .catch((err) => errorNotification('Не удалось принят заказ', err.response?.status));
+      .catch((err) => errorNotification('Не удалось принят заказ', err.response?.status))
+      .finally(() => {
+        setLoadings((prevLoadings) => {
+          const newLoadings = [...prevLoadings];
+          newLoadings[0] = false;
+          return newLoadings;
+        });
+      });
   };
 
   const onRejectOrder = (orderId: number) => {
+    setLoadings((prevLoadings) => {
+      const newLoadings = [...prevLoadings];
+      newLoadings[1] = true;
+      return newLoadings;
+    });
     OrdersService.rejectOrder(orderId)
       .then(() => {
-        openNotification('Заказ не принят!', '', 'success', 1.5);
+        openNotification('Заказ отклонен!', '', 'success', 1.5);
         setShouldRerender(!shouldRerender);
       })
-      .catch((err) => errorNotification('Не удалось отклонять заказ', err.response?.status));
+      .catch((err) => errorNotification('Не удалось отклонять заказ', err.response?.status))
+      .finally(() => {
+        setLoadings((prevLoadings) => {
+          const newLoadings = [...prevLoadings];
+          newLoadings[1] = false;
+          return newLoadings;
+        });
+      });
   };
 
   const columns = [
@@ -112,12 +137,12 @@ const useOrdersPage = () => {
             </Link>
           </Popover>
           <Popover title="Принять заказ">
-            <Button type="primary" ghost onClick={() => onAcceptOrder(record.key)}>
+            <Button type="primary" ghost onClick={() => onAcceptOrder(record.key)} loading={loadings[0]}>
               <CheckCircleOutlined twoToneColor="#2ECC71" />
             </Button>
           </Popover>
           <Popover title="Отклонять заказ">
-            <Button type="default" danger onClick={() => onRejectOrder(record.key)}>
+            <Button type="default" danger onClick={() => onRejectOrder(record.key)} loading={loadings[1]}>
               <CloseCircleOutlined twoToneColor="#ff0000" />
             </Button>
           </Popover>

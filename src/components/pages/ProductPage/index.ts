@@ -1,3 +1,3 @@
-import OrdersPage from './OrdersPage';
+import ProductsPage from './ProductsPage';
 
-export default OrdersPage;
+export default ProductsPage;

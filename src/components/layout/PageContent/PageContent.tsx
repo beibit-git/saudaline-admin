@@ -2,10 +2,11 @@ import React from 'react';
 import { Route, Switch } from 'react-router-dom';
 import CategoriesPage from '../../pages/CategoriesPage';
 import CategoryCreationPage from '../../pages/CategoriesPage/CategoryCreationPage/CategoryCreationPage';
-import OrdersPage from '../../pages/ProductPage';
 import ProductsPage from '../../pages/ProductPage';
 import ProductCreationPage from '../../pages/ProductPage/ProductCreationPage/ProductCreationPage';
 import UserPage from '../../pages/UserPage';
+import OrdersPage from '../../pages/OrdersPage';
+import OrderShowPage from '../../pages/OrdersPage/OrderShowPage/OrderShowPage';
 
 const PageContent = () => {
   return (
@@ -25,6 +26,7 @@ const PageContent = () => {
           render={({ match }) => <ProductCreationPage productId={parseInt(match.params.id)} />}
         />
         <Route exact path="/orders" component={OrdersPage}></Route>
+        <Route path="/orders/show/:id" render={({ match }) => <OrderShowPage orderId={parseInt(match.params.id)} />} />
         {/* <Route exact path="/teachers" component={TeachersPage}></Route>
         <Route exact path="/teacher/:id" render={({ match }) => <TeacherPage isPublic={false} />} /> */}
       </Switch>
