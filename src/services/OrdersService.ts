@@ -25,21 +25,25 @@ export class OrdersService {
     });
   }
 
-  static deleteCategory(categoryId: number) {
-    return authAxios.delete(`/api/v1/orders/delete-category?id=${categoryId}`);
+  static acceptOrder(orderId: number) {
+    return authAxios.post(`/api/v1/orders/accept-order?orderId=${orderId}`);
   }
 
-  static getOneCategory(categoryId: number) {
-    return authAxios.get<CategoriesDtoResponse>(`/api/v1/orders/get-by-id?categoryId=${categoryId}`);
+  static rejectOrder(orderId: number) {
+    return authAxios.post(`/api/v1/orders/reject-order?orderId=${orderId}`);
   }
 
-  // status 200
-  static updateCategory(categoryId: number, updatedCategory: CategoryDtoRequest) {
-    return authAxios.put(`/api/v1/orders/update-order?categoryId=${categoryId}`, updatedCategory);
-  }
+  // static getOneCategory(categoryId: number) {
+  //   return authAxios.get<CategoriesDtoResponse>(`/api/v1/orders/get-by-id?categoryId=${categoryId}`);
+  // }
 
-  // Возвращает ID только что созданной дисциплины
-  static createCategory(category: CategoryDtoRequest) {
-    return authAxios.post<number>('/api/v1/orders/create-category', category);
-  }
+  // // status 200
+  // static updateCategory(categoryId: number, updatedCategory: CategoryDtoRequest) {
+  //   return authAxios.put(`/api/v1/orders/update-order?categoryId=${categoryId}`, updatedCategory);
+  // }
+
+  // // Возвращает ID только что созданной дисциплины
+  // static createCategory(category: CategoryDtoRequest) {
+  //   return authAxios.post<number>('/api/v1/orders/create-category', category);
+  // }
 }

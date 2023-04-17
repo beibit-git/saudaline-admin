@@ -1,5 +1,5 @@
-import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
-import { Button, Space, Popconfirm, Image, Tag } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, EyeOutlined } from '@ant-design/icons';
+import { Button, Space, Popconfirm, Image, Tag, Popover } from 'antd';
 import { useEffect, useState } from 'react';
 import { errorNotification } from '../../../helpers/errorNotification';
 import { useNotification } from '../../../contexts/notificationContext';
@@ -10,6 +10,8 @@ import { ProductsService } from '../../../services/ProductsService';
 import { ProductsDtoResponse } from '../../../interfaces/Products/ProductsDtoResponse';
 import { OrdersDtoForAllResponse } from '../../../interfaces/Orders/OrdersDtoForAllResponse';
 import { OrdersService } from '../../../services/OrdersService';
+import { OrderStatus } from './OrderStatus/OrderStatus';
+import { DateField } from '../../../helpers/DateField';
 
 const useOrdersPage = () => {
   const [shouldRerender, setShouldRerender] = useState(false);
@@ -46,13 +48,22 @@ const useOrdersPage = () => {
     return () => clearInterval(delayedSearch);
   }, [currentPage, searchQuery, selectedCategory, selectedSubCategory, shouldRerender]);
 
-  const onDeleteProduct = (productId: number) => {
-    ProductsService.deleteProduct(productId)
+  const onAcceptOrder = (orderId: number) => {
+    OrdersService.acceptOrder(orderId)
       .then(() => {
-        openNotification('Запись удалено!', '', 'success', 1.5);
+        openNotification('Заказ принят!', '', 'success', 1.5);
         setShouldRerender(!shouldRerender);
       })
-      .catch((err) => errorNotification('Не удалось удалить данные', err.response?.status));
+      .catch((err) => errorNotification('Не удалось принят заказ', err.response?.status));
+  };
+
+  const onRejectOrder = (orderId: number) => {
+    OrdersService.rejectOrder(orderId)
+      .then(() => {
+        openNotification('Заказ не принят!', '', 'success', 1.5);
+        setShouldRerender(!shouldRerender);
+      })
+      .catch((err) => errorNotification('Не удалось отклонять заказ', err.response?.status));
   };
 
   const columns = [
@@ -65,17 +76,20 @@ const useOrdersPage = () => {
       title: 'Статус',
       dataIndex: 'status',
       key: 'status',
-      render: (record: any) => <Tag color="error">{record}</Tag>,
+      render: (record: any) => {
+        return <OrderStatus status={record} />;
+      },
     },
     {
       title: 'Дата',
       dataIndex: 'created',
       key: 'created',
+      render: (record: any) => <DateField format="DD-MM-YYYY HH:mm" value={record} />,
     },
     {
       title: 'Кол',
-      dataIndex: 'totalAmount',
-      key: 'totalAmount',
+      dataIndex: 'totalQuantity',
+      key: 'totalQuantity',
     },
     {
       title: 'Цена',
@@ -90,21 +104,23 @@ const useOrdersPage = () => {
       width: 120,
       render: (text: any, record: any) => (
         <Space size="middle">
-          <Link to={`/products/edit/${record.key}`}>
-            <Button>
-              <EditTwoTone />
+          <Popover title="Посмотреть заказ">
+            <Link to={`/orders/show/${record.key}`}>
+              <Button>
+                <EyeOutlined />
+              </Button>
+            </Link>
+          </Popover>
+          <Popover title="Принять заказ">
+            <Button type="primary" ghost onClick={() => onAcceptOrder(record.key)}>
+              <CheckCircleOutlined twoToneColor="#2ECC71" />
             </Button>
-          </Link>
-          <Popconfirm
-            title="Вы уверены, что хотите удалить запись?"
-            onConfirm={() => onDeleteProduct(record.key)}
-            okText="Да"
-            cancelText="Нет"
-          >
-            <Button type="default" danger>
-              <DeleteTwoTone twoToneColor="#ff0000" />
+          </Popover>
+          <Popover title="Отклонять заказ">
+            <Button type="default" danger onClick={() => onRejectOrder(record.key)}>
+              <CloseCircleOutlined twoToneColor="#ff0000" />
             </Button>
-          </Popconfirm>
+          </Popover>
         </Space>
       ),
     },
@@ -131,7 +147,8 @@ const useOrdersPage = () => {
     setSelectedCategory,
     selectedSubCategory,
     setSelectedSubCategory,
-    onDeleteProduct,
+    onAcceptOrder,
+    onRejectOrder,
     columns,
   };
 };
