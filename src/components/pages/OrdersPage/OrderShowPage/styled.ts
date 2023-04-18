@@ -2,26 +2,18 @@ import styled from '@emotion/styled';
 import { Col } from 'antd';
 
 export const ContainerDetails = styled(Col)`
-  display: flex;
-  flex-direction: column;
   justify-content: flex-end;
   align-items: flex-end;
-
-  svg {
-    margin-right: 10px;
-  }
-
-  @media screen and (max-width: 768px) {
-    margin-top: 35px;
-    flex-direction: column;
-  }
+  margin: 0;
 `;
 
 export const CourierBoxContainer = styled(Col)`
   display: flex;
+  flex-direction: row;
   justify-content: flex-end;
   align-items: center;
   margin-bottom: 10px;
+  width: 100%;
   color: white;
 
   svg {

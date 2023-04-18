@@ -7,6 +7,7 @@ import ProductCreationPage from '../../pages/ProductPage/ProductCreationPage/Pro
 import UserPage from '../../pages/UserPage';
 import OrdersPage from '../../pages/OrdersPage';
 import OrderShowPage from '../../pages/OrdersPage/OrderShowPage/OrderShowPage';
+import PromotionsPage from '../../pages/PromotionPage';
 
 const PageContent = () => {
   return (
@@ -27,6 +28,7 @@ const PageContent = () => {
         />
         <Route exact path="/orders" component={OrdersPage}></Route>
         <Route path="/orders/show/:id" render={({ match }) => <OrderShowPage orderId={parseInt(match.params.id)} />} />
+        <Route exact path="/promotions" component={PromotionsPage}></Route>
         {/* <Route exact path="/teachers" component={TeachersPage}></Route>
         <Route exact path="/teacher/:id" render={({ match }) => <TeacherPage isPublic={false} />} /> */}
       </Switch>

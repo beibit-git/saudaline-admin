@@ -124,7 +124,7 @@ const OrderShowPage = ({ orderId }: Props) => {
     </CourierInfoBox>
   );
 
-  const renderDeliverables = () => (
+  const renderProducts = () => (
     <>
       {order ? (
         <>
@@ -236,7 +236,7 @@ const OrderShowPage = ({ orderId }: Props) => {
       <br />
       <Col xl={24} lg={24}>
         <Title level={3} style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div>{order ? `Заказ №${order.id}` : 'Ошибка'} </div>
+          <div>{order ? `Заказ №${order.id}` : 'Загрузка'} </div>
           <div>
             <Text style={{ fontSize: '16px' }}>
               Статус заказа: <OrderStatus status={order?.status} />
@@ -271,7 +271,7 @@ const OrderShowPage = ({ orderId }: Props) => {
         <>
           <Card>
             <Row justify="space-between">
-              <Col xl={12} lg={10}>
+              <Col xl={12} lg={12}>
                 <div className={styles.flexrow}>
                   <Avatar size={108} src={order?.customer.logotype[0].url} />
                   <div className={styles.orderer}>
@@ -316,8 +316,8 @@ const OrderShowPage = ({ orderId }: Props) => {
                   </Text>
                 </Col>
               </Col>
-              <ContainerDetails xl={12} lg={10}>
-                <CourierBoxContainer xl={12} lg={14} md={24}>
+              <ContainerDetails xl={12} lg={12}>
+                <CourierBoxContainer xl={24} lg={24} md={24}>
                   {courierInfoBox(
                     'Телефон',
                     <MobileOutlined style={{ color: '#ffff', fontSize: 32 }} />,
@@ -329,7 +329,7 @@ const OrderShowPage = ({ orderId }: Props) => {
                     order?.deliveryDetails.address
                   )}
                 </CourierBoxContainer>
-                <CourierBoxContainer xl={12} lg={14} md={24}>
+                <CourierBoxContainer xl={24} lg={24} md={24}>
                   {courierInfoBox(
                     'Дата заказа',
                     <FieldTimeOutlined style={{ color: '#ffff', fontSize: 32 }} />,
@@ -346,7 +346,7 @@ const OrderShowPage = ({ orderId }: Props) => {
           </Card>
         </>
       ) : null}
-      {renderDeliverables()}
+      {renderProducts()}
     </PageWrapper>
   );
 };
