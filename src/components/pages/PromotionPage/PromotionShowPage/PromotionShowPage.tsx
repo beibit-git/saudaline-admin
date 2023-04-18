@@ -1,6 +1,6 @@
 import React, { useState, ReactNode } from 'react';
-import { Button, Typography, Row, Col, Spin, Avatar, Table, Space, Image, Tag, Divider } from 'antd';
-import { FieldTimeOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Typography, Row, Col, Spin, Avatar, Table, Space, Image, Tag, Divider, Popconfirm } from 'antd';
+import { FieldTimeOutlined, PlusOutlined, EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
 import PageWrapper from '../../../../ui/PageWrapper';
 import BackButton from '../../../../ui/BackButton';
 import { errorNotification } from '../../../../helpers/errorNotification';
@@ -23,6 +23,7 @@ import { PromotionStatus } from './PromotionStatus';
 import { DateField } from '../../../../helpers/DateField';
 import { PromotionProducts } from '../../../../interfaces/Promotions/PromotionProducts';
 import ProductAddModal from './ProductAddModal';
+import { ProductPromotionService } from '../../../../services/ProductPromotionService';
 
 const { Title } = Typography;
 const { Text } = Typography;
@@ -37,6 +38,7 @@ const PromotionShowPage = ({ promotionId }: Props) => {
   const [openProductModalValue, setOpenProductModalValue] = useState<boolean>(false);
   const [isLoading, setLoading] = useState(false);
   const [promotion, setPromotion] = useState<Promotions>();
+  const [productPromotion, setProductPromotion] = useState<number>();
   const { openNotification } = useNotification();
   const [loadings, setLoadings] = useState<boolean[]>([]);
 
@@ -53,8 +55,23 @@ const PromotionShowPage = ({ promotionId }: Props) => {
     }
   }, [promotionId, shouldRerender]);
 
-  const openProductAddModal = () => {
+  const openProductAddModal = (promotionProductId: number) => {
+    setProductPromotion(promotionProductId);
     setOpenProductModalValue(true);
+  };
+
+  const openProductAddModal2 = () => {
+    setProductPromotion(undefined);
+    setOpenProductModalValue(true);
+  };
+
+  const onDeleteromotionProduct = (promotionProductId: number) => {
+    ProductPromotionService.deleteProductPromotion(promotionProductId)
+      .then(() => {
+        openNotification('Запись удалено!', '', 'success', 1.5);
+        setShouldRerender(!shouldRerender);
+      })
+      .catch((err) => errorNotification('Не удалось удалить данные', err.response?.status));
   };
 
   const promotionStartDate = (text: string, icon: ReactNode, value: string) => (
@@ -82,7 +99,7 @@ const PromotionShowPage = ({ promotionId }: Props) => {
         <Title level={5} className={styles.title}>
           Товары, участвующие в акции
         </Title>
-        <Button type="primary" icon={<PlusOutlined />} onClick={openProductAddModal}>
+        <Button type="primary" icon={<PlusOutlined />} onClick={openProductAddModal2}>
           Добавить товар
         </Button>
       </header>
@@ -151,19 +168,20 @@ const PromotionShowPage = ({ promotionId }: Props) => {
           dataIndex="actions"
           render={(_text, record) => {
             return (
-              <Space>
-                {/* <EditButton
-                  hideText
-                  size="small"
-                  resource="promotion-product"
-                  onClick={() => editShow(record.id)}
-                />
-                <DeleteButton
-                  hideText
-                  size="small"
-                  recordItemId={(record as BaseRecord).id as BaseKey}
-                  resource="promotion-product"
-                /> */}
+              <Space size="middle">
+                <Button onClick={() => openProductAddModal(record.id)}>
+                  <EditTwoTone />
+                </Button>
+                <Popconfirm
+                  title="Вы уверены, что хотите удалить запись?"
+                  onConfirm={() => onDeleteromotionProduct(record.id)}
+                  okText="Да"
+                  cancelText="Нет"
+                >
+                  <Button type="default" danger>
+                    <DeleteTwoTone twoToneColor="#ff0000" />
+                  </Button>
+                </Popconfirm>
               </Space>
             );
           }}
@@ -226,6 +244,7 @@ const PromotionShowPage = ({ promotionId }: Props) => {
       <ProductAddModal
         openModal={openProductModalValue}
         promotionId={promotionId}
+        productPromotionId={productPromotion}
         onClose={() => setOpenProductModalValue(false)}
       />
     </PageWrapper>
