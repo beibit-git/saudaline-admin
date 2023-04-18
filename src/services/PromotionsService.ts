@@ -25,16 +25,16 @@ export class PromotionsService {
   }
 
   static deletePromotion(promotionId: number) {
-    return authAxios.delete(`/api/v1/promotion/delete-promotion?id=${promotionId}`);
+    return authAxios.delete(`/api/v1/promotion/delete-promotion?promotionId=${promotionId}`);
   }
 
   static getOnePromotion(promotionId: number) {
-    return authAxios.get<Promotions>(`/api/v1/promotion/get-by-id?productId=${promotionId}`);
+    return authAxios.get<Promotions>(`/api/v1/promotion/get-by-id?promotionId=${promotionId}`);
   }
 
   // status 200
   static updatePromotion(promotionId: number, updatedPromotion: PromotionsDtoRequest) {
-    return authAxios.put(`/api/v1/promotion/update-promotion?productId=${promotionId}`, updatedPromotion);
+    return authAxios.put(`/api/v1/promotion/update-promotion?promotionId=${promotionId}`, updatedPromotion);
   }
 
   // Возвращает ID только что созданной дисциплины

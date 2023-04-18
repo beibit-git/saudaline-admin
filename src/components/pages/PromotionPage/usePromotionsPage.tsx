@@ -1,5 +1,5 @@
-import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
-import { Button, Space, Popconfirm, Image, Tag } from 'antd';
+import { DeleteTwoTone, EditTwoTone, EyeOutlined } from '@ant-design/icons';
+import { Button, Space, Popconfirm, Image, Tag, Popover } from 'antd';
 import { useEffect, useState } from 'react';
 import { errorNotification } from '../../../helpers/errorNotification';
 import { useNotification } from '../../../contexts/notificationContext';
@@ -42,7 +42,7 @@ const usePromotionsPage = () => {
   const onDeletePromotion = (promotionId: number) => {
     PromotionsService.deletePromotion(promotionId)
       .then(() => {
-        openNotification('Запись удалено!', '', 'success', 1.5);
+        openNotification('Акция удалено!', '', 'success', 1.5);
         setShouldRerender(!shouldRerender);
       })
       .catch((err) => errorNotification('Не удалось удалить данные', err.response?.status));
@@ -95,11 +95,20 @@ const usePromotionsPage = () => {
       width: 120,
       render: (text: any, record: any) => (
         <Space size="middle">
-          <Link to={`/products/edit/${record.key}`}>
-            <Button>
-              <EditTwoTone />
-            </Button>
-          </Link>
+          <Popover title="Посмотреть акцию">
+            <Link to={`/promotions/show/${record.key}`}>
+              <Button>
+                <EyeOutlined />
+              </Button>
+            </Link>
+          </Popover>
+          <Popover title="Изменить акцию">
+            <Link to={`/promotions/edit/${record.key}`}>
+              <Button>
+                <EditTwoTone />
+              </Button>
+            </Link>
+          </Popover>
           <Popconfirm
             title="Вы уверены, что хотите удалить запись?"
             onConfirm={() => onDeletePromotion(record.key)}

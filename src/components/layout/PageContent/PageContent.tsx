@@ -8,6 +8,8 @@ import UserPage from '../../pages/UserPage';
 import OrdersPage from '../../pages/OrdersPage';
 import OrderShowPage from '../../pages/OrdersPage/OrderShowPage/OrderShowPage';
 import PromotionsPage from '../../pages/PromotionPage';
+import PromotionCreationPage from '../../pages/PromotionPage/PromotionCreatePage/PromotionCreationPage';
+import PromotionShowPage from '../../pages/PromotionPage/PromotionShowPage/PromotionShowPage';
 
 const PageContent = () => {
   return (
@@ -29,6 +31,15 @@ const PageContent = () => {
         <Route exact path="/orders" component={OrdersPage}></Route>
         <Route path="/orders/show/:id" render={({ match }) => <OrderShowPage orderId={parseInt(match.params.id)} />} />
         <Route exact path="/promotions" component={PromotionsPage}></Route>
+        <Route exact path="/promotions/create" component={PromotionCreationPage}></Route>
+        <Route
+          path="/promotions/edit/:id"
+          render={({ match }) => <PromotionCreationPage promotionId={parseInt(match.params.id)} />}
+        />
+        <Route
+          path="/promotions/show/:id"
+          render={({ match }) => <PromotionShowPage promotionId={parseInt(match.params.id)} />}
+        />
         {/* <Route exact path="/teachers" component={TeachersPage}></Route>
         <Route exact path="/teacher/:id" render={({ match }) => <TeacherPage isPublic={false} />} /> */}
       </Switch>

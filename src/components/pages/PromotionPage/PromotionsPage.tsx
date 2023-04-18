@@ -14,11 +14,11 @@ const PromotionsPage = () => {
     <PageWrapper>
       <header className={styles.header}>
         <Title level={3} className={styles.title}>
-          Товары
+          Акции
         </Title>
-        <Link to="/products/create">
+        <Link to="/promotions/create">
           <Button type="primary" icon={<PlusOutlined />}>
-            Добавить товар
+            Создать акцию
           </Button>
         </Link>
       </header>

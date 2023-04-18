@@ -1,0 +1,27 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.orderShowHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.orderShowHeader .status {
+  font-size: 12px;
+}
+
+.orderer {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexrow {
+  display: flex;
+  flex-direction: row;
+}

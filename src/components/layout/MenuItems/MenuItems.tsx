@@ -68,7 +68,7 @@ const MenuItems = () => {
           </Menu.Item>
         </Menu>
         <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
-          <Menu.Item key="/orders" icon={<MedicineBoxFilled />}>
+          <Menu.Item key="/promotions" icon={<MedicineBoxFilled />}>
             <Link to="/promotions"></Link>
             Акции
           </Menu.Item>

@@ -29,4 +29,10 @@ export class SubCategoriesService {
   static deleteSubCategory(subcategoryId: number) {
     return authAxios.delete(`/api/v1/subcategory/delete-by-id?id=${subcategoryId}`);
   }
+
+  static getByCategory(categoryId: number) {
+    return authAxios.get<{ list: SubCategoriesDtoResponse[]; total_number: number }>(
+      `/api/v1/subcategory/get-all-by-category?categoryId=${categoryId}`
+    );
+  }
 }

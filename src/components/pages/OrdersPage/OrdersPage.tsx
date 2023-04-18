@@ -16,11 +16,6 @@ const OrdersPage = () => {
         <Title level={3} className={styles.title}>
           Заказы
         </Title>
-        <Link to="/products/create">
-          <Button type="primary" icon={<PlusOutlined />}>
-            Добавить товар
-          </Button>
-        </Link>
       </header>
 
       <Table
