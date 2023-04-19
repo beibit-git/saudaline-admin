@@ -1,8 +1,7 @@
 import './style.module.css';
 
 import React, { useState } from 'react';
-import { Input, Typography, Form, Button, Space, Checkbox, Spin, Select, Upload, Image, DatePicker } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Input, Typography, Form, Button, Space, Checkbox, Spin, Upload, DatePicker } from 'antd';
 import PageWrapper from '../../../../ui/PageWrapper';
 import BackButton from '../../../../ui/BackButton';
 import UserService from '../../../../services/userService';
@@ -36,7 +35,6 @@ const PromotionCreationPage = ({ promotionId }: Props) => {
       setLoading(true);
       PromotionsService.getOnePromotion(promotionId)
         .then(({ data }) => {
-          console.log('121321321');
           form.setFieldsValue({
             title: data.title,
             subTitle: data.subTitle,

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Typography, Modal, Form, InputNumber, Radio, Select, Space, Col, Image, Spin } from 'antd';
 import { errorNotification } from '../../../../helpers/errorNotification';
-import { useNotification } from '../../../../contexts/notificationContext';
-import { Constants } from '../../../../common/constants';
 import { CategoriesDtoResponse } from '../../../../interfaces/Categories/CategoriesDtoResponse';
 import { SubCategoriesDtoResponse } from '../../../../interfaces/Categories/SubCategoriesDtoResponse';
 import { CategoriesService } from '../../../../services/CategoriesService';
@@ -18,13 +16,12 @@ const { Text } = Typography;
 
 interface Props {
   promotionId?: number;
-  productPromotionId?: number;
+  productPromotionId?: number | null;
   openModal: boolean;
   onClose: () => void;
 }
 
 const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }: Props) => {
-  const apiUrl = Constants.API_BASE_URL;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [shouldRerender, setShouldRerender] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -33,20 +30,11 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
   const [categoryId, setCategoryId] = useState<number>();
   const [subCategoryId, setSubCategoryId] = useState<number>();
   const [subCategories, setSubCategories] = useState<SubCategoriesDtoResponse[]>([]);
-  const { openNotification } = useNotification();
-  const [loadings, setLoadings] = useState<boolean[]>([]);
 
   const handleCancel = () => {
-    onClose();
-    productPromotionId = undefined;
-    setIsModalOpen(false);
     form.resetFields();
-  };
-
-  const handleOk = () => {
     onClose();
     setIsModalOpen(false);
-    console.log(form);
   };
 
   const [form] = Form.useForm();
@@ -54,8 +42,9 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
   // useEffect для страниц с редактированием дисциплины
   React.useEffect(() => {
     setIsModalOpen(openModal);
-    setLoading(true);
-    if (productPromotionId) {
+    form.resetFields();
+    if (productPromotionId !== null && productPromotionId !== undefined) {
+      setLoading(true);
       ProductPromotionService.getOneProductPromotion(productPromotionId)
         .then(({ data }) => {
           form.setFieldsValue({
@@ -63,19 +52,38 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
             discount: data.discount,
             discountPrice: data.discountPrice,
             isActive: data.isActive,
-            product: data.product,
+            productDetails: data.product,
+            product: data.product.id,
+            photo: data.product.mainPhoto[0].url,
           });
         })
         .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
         .finally(() => setLoading(false));
     }
-    setLoading(false);
   }, [productPromotionId, shouldRerender, openModal]);
 
   React.useEffect(() => {
     CategoriesService.getAllCategories()
       .then(({ data }) => {
         setCategories(data.list);
+      })
+      .catch((err) => errorNotification('Не удалось получить данные', err.response?.status));
+    SubCategoriesService.getSubCategories({})
+      .then(({ data }) => {
+        if (data.list == null) {
+          setSubCategories([]);
+        } else {
+          setSubCategories(data.list);
+        }
+      })
+      .catch((err) => errorNotification('Не удалось получить данные', err.response?.status));
+    ProductsService.getProducts({})
+      .then(({ data }) => {
+        if (data.list == null) {
+          setProducts([]);
+        } else {
+          setProducts(data.list);
+        }
       })
       .catch((err) => errorNotification('Не удалось получить данные', err.response?.status));
   }, []);
@@ -103,25 +111,27 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
 
   const onFinish = (promotionProduct: PromotionProductDtoRequest) => {
     setLoading(true);
-    ProductPromotionService.createProductPromotion(promotionProduct)
-      .then(() => successNotification('Данные успешно сохранены'))
-      .catch((err) => {
-        if (err.response.data.message == 'This product is already discounted.') {
-          errorNotification('Этот товар уже со скидкой.');
-        } else {
-          errorNotification('Не удалось сохранить данные', err.response?.status);
-        }
-      })
-      .finally(() => setLoading(false));
-    // productId
-    //   ? ProductsService.updateProduct(productId, product)
-    //       .then(() => successNotification('Данные успешно обновлены'))
-    //       .catch((err) => errorNotification('Не удалось обновить данные', err.response?.status))
-    //       .finally(() => setLoading(false))
-    //   : ProductsService.createProduct(product)
-    //       .then(() => successNotification('Данные успешно сохранены'))
-    //       .catch((err) => errorNotification('Не удалось сохранить данные', err.response?.status))
-    //       .finally(() => setLoading(false));
+    productPromotionId
+      ? ProductPromotionService.updateProductPromotion(productPromotionId, promotionProduct)
+          .then(() => successNotification('Данные успешно обновлены'))
+          .catch((err) => {
+            if (err.response.data.message === 'This product is already discounted.') {
+              errorNotification('Этот товар уже со скидкой.');
+            } else {
+              errorNotification('Не удалось обновить данные', err.response?.status);
+            }
+          })
+          .finally(() => setLoading(false))
+      : ProductPromotionService.createProductPromotion(promotionProduct)
+          .then(() => successNotification('Данные успешно сохранены'))
+          .catch((err) => {
+            if (err.response.data.message === 'This product is already discounted.') {
+              errorNotification('Этот товар уже со скидкой.');
+            } else {
+              errorNotification('Не удалось сохранить данные', err.response?.status);
+            }
+          })
+          .finally(() => setLoading(false));
   };
 
   return (
@@ -135,38 +145,30 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
         <Spin />
       ) : (
         <>
-          {productPromotionId ? (
+          {productPromotionId !== null && productPromotionId !== undefined ? (
             <>
-              {form.getFieldValue('product') ? (
-                <Form form={form} layout="vertical" name="userForm" onFinish={onFinish}>
-                  {/* {console.log(form.getFieldValue('product'))} */}
+              {form.getFieldValue('productDetails') !== null && form.getFieldValue('productDetails') !== undefined ? (
+                <Form form={form} layout="vertical" onFinish={onFinish}>
                   <Image
-                    src={form.getFieldValue('product')?.mainPhoto[0]?.url}
-                    title={form.getFieldValue('product')?.title}
+                    src={form.getFieldValue('photo')}
+                    title={form.getFieldValue('productDetails')?.title}
                     width={'30%'}
                   />
-                  <Typography>{form.getFieldValue('product')?.title}</Typography>
-                  <Form.Item
-                    hidden
-                    label="Товар"
-                    initialValue={form.getFieldValue('product')?.id}
-                    name="product"
-                  ></Form.Item>
+                  <Typography>{form.getFieldValue('productDetails')?.title}</Typography>
+                  <Form.Item hidden label="Товар" name="product"></Form.Item>
                   <Form.Item name="discount" label="Скидка" rules={[{ required: true }]}>
                     <InputNumber />
                   </Form.Item>
-                  <Form.Item hidden initialValue={promotionId} name="promotion"></Form.Item>
                   <Form.Item
                     label="Сделать активным"
                     name="isActive"
-                    valuePropName="defaultValue"
                     rules={[
                       {
                         required: true,
                       },
                     ]}
                   >
-                    <Radio.Group>
+                    <Radio.Group defaultValue={true}>
                       <Radio value="true"> Да</Radio>
                       <Radio value="false"> Нет </Radio>
                     </Radio.Group>
@@ -192,7 +194,7 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
               ) : null}
             </>
           ) : (
-            <Form form={form} layout="vertical" name="userForm" onFinish={onFinish}>
+            <Form form={form} layout="vertical" onFinish={onFinish}>
               <Col span={24}>
                 <Text>Категория</Text>
                 <Select

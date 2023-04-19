@@ -1,15 +1,13 @@
-import { Button, Table, Typography, Grid } from 'antd';
+import { Table, Typography } from 'antd';
 import PageWrapper from '../../../ui/PageWrapper';
 import styles from './style.module.css';
-import { Link } from 'react-router-dom';
-import { PlusOutlined } from '@ant-design/icons';
 import useOrdersPage from './useOrdersPage';
 
 const { Title } = Typography;
 
 const OrdersPage = () => {
   const { loading, orders, totalOrders, setCurrentPage, columns } = useOrdersPage();
-  const breakpoint = Grid.useBreakpoint();
+
   return (
     <PageWrapper>
       <header className={styles.header}>

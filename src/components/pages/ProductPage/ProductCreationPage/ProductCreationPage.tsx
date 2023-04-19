@@ -1,8 +1,7 @@
 import './style.module.css';
 
 import React, { useState } from 'react';
-import { Input, Typography, Form, Button, Space, Checkbox, Spin, Select, Upload, Image } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import { Input, Typography, Form, Button, Space, Spin, Select, Upload } from 'antd';
 import PageWrapper from '../../../../ui/PageWrapper';
 import { CategoriesService } from '../../../../services/CategoriesService';
 import { CategoriesDtoResponse } from '../../../../interfaces/Categories/CategoriesDtoResponse';
@@ -10,7 +9,6 @@ import BackButton from '../../../../ui/BackButton';
 import UserService from '../../../../services/userService';
 import { errorNotification } from '../../../../helpers/errorNotification';
 import { successNotification } from '../../../../helpers/successNotification';
-import { CategoryDtoRequest } from '../../../../interfaces/Categories/CategoryDtoRequest';
 import { ProductsService } from '../../../../services/ProductsService';
 import { ProductDtoRequest } from '../../../../interfaces/Products/ProductDtoRequest';
 import { BrandsService } from '../../../../services/BrandsService';

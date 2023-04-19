@@ -1,34 +1,58 @@
 import './index.css';
 
-import { Avatar, Button, Col, Drawer, Dropdown, Layout, Menu, Row, Space, Typography } from 'antd';
-import { UserOutlined, LogoutOutlined, DownOutlined, MenuOutlined, UserSwitchOutlined } from '@ant-design/icons';
+import {
+  Avatar,
+  Button,
+  Col,
+  Drawer,
+  Dropdown,
+  Layout,
+  Menu,
+  Row,
+  Space,
+  Tag,
+  Typography,
+  Modal,
+  Card,
+  Spin,
+  Form,
+  Input,
+} from 'antd';
+import { UserOutlined, LogoutOutlined, DownOutlined, MenuOutlined } from '@ant-design/icons';
 
 import MenuItems from './MenuItems';
 import PageContent from './PageContent';
 import UserService from '../../services/userService';
-import { Link, useHistory } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import useWindowDimensions from '../../hooks/useWindowDimensions/useWindowDimensions';
 import windowBreakpointWidth from '../../helpers/windowBreakpointWidth';
 import { useTheme } from '../../themes/useTheme';
-import AuthenticatedContent from '../../common/AuthenticatedContent';
-import checkRoleListContains from '../../helpers/checkRoleListContains';
+import { TariffListDto } from '../../interfaces/Tariff/TariffListDto';
+import { TariffService } from '../../services/TariffService';
+import { errorNotification } from '../../helpers/errorNotification';
+import { TariffAddRequest } from '../../interfaces/Tariff/TariffAddRequest';
 
 const { Header, Content, Sider } = Layout;
 const PUBLIC_URL = process.env.PUBLIC_URL;
 
 const PageLayout = () => {
   const [profile, setProfile] = useState<any>();
+  const [provider, setProvider] = useState<any>();
+  const [tariffList, setTariffList] = useState<TariffListDto[]>([]);
+  const [tariff, setTariff] = useState<TariffListDto>();
+  const [isLoading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [tariffRegModal, setTariffRegModal] = useState(false);
   const [isDarkMode] = useTheme();
-  const history = useHistory();
   const { width } = useWindowDimensions();
+
+  const [form] = Form.useForm();
 
   const menuItemStyle = {
     padding: '10px 12px',
   };
-
-  const role = useRef(UserService.getCurrentUser());
 
   const popoverContent = (
     <Menu style={{ borderRadius: 12 }}>
@@ -43,15 +67,38 @@ const PageLayout = () => {
     </Menu>
   );
 
+  const handleTariffButton = (tariff: TariffListDto) => {
+    setTariff(tariff);
+    setTariffRegModal(true);
+  };
+
   useEffect(() => {
     // ДЛЯ РЕШЕНИЯ ПРОБЛЕМЫ С ПРОСРОЧКОЙ ТОКЕНА ДЛЯ ВХОДА ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
     UserService.getProfileByPrincipal();
+    UserService.getProfileByPrincipal().then((response) => {
+      setProvider(response.data);
+    });
     setProfile(UserService.getCurrentUser());
   }, []);
 
-  const switchRoles = (changeTo: string) => {
-    UserService.switchRoles(changeTo);
-    window.location.reload();
+  useEffect(() => {
+    if (provider?.tariff === null || provider?.balance === 0) {
+      setLoading(true);
+      TariffService.getTariffList()
+        .then((response) => {
+          setTariffList(response.data);
+        })
+        .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
+        .finally(() => setLoading(false));
+      setIsModalOpen(true);
+    } else {
+      setIsModalOpen(false);
+    }
+  }, [provider]);
+
+  const onFinish = (tariffAdd: TariffAddRequest) => {
+    setLoading(true);
+    console.log(tariffAdd);
   };
 
   return (
@@ -88,6 +135,10 @@ const PageLayout = () => {
             </Col>
             <Col flex={'auto'}></Col>
             <Col flex={0}>
+              <Typography.Text style={{ color: 'white', marginRight: 10 }}>Мой баланс:</Typography.Text>
+              <Tag color="processing" style={{ fontSize: 14, fontWeight: 600, marginRight: 10 }}>
+                {`${provider?.balance?.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1 ')}`}
+              </Tag>
               <Space>
                 <Dropdown overlay={popoverContent} trigger={['click']} overlayStyle={{ padding: '10px 0' }}>
                   <a>
@@ -104,6 +155,88 @@ const PageLayout = () => {
           <PageContent />
         </Content>
       </Layout>
+      <Modal
+        title="Чтобы воспользоваться нашим сервисом, вам необходимо подключить тариф"
+        open={isModalOpen}
+        closable={false}
+        footer={null}
+        width={'70%'}
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        {isLoading ? (
+          <Spin />
+        ) : (
+          <>
+            <Typography.Title level={4}>
+              После подключения тарифа ваш баланс будет пополнен на сумму стоимости тарифа
+            </Typography.Title>
+            <Row gutter={16} style={{ marginTop: '25px' }}>
+              {tariffList?.map((tariff) => (
+                <Col span={8} key={tariff?.id}>
+                  <Card
+                    title={tariff?.title}
+                    actions={[
+                      <Button type="primary" value={tariff?.id} onClick={() => handleTariffButton(tariff)}>
+                        Подключить
+                      </Button>,
+                    ]}
+                  >
+                    <Typography.Title level={4}>Сумма пополнения согласно тарифному плану</Typography.Title>
+                    <Typography.Title level={3} style={{ fontWeight: 700 }}>
+                      {tariff?.sum?.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1 ')} т
+                    </Typography.Title>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </>
+        )}
+      </Modal>
+      <Modal
+        title="Подключение тарифа"
+        open={tariffRegModal}
+        footer={null}
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        <Form form={form} layout="vertical" onFinish={onFinish}>
+          <Typography style={{ textAlign: 'center', fontSize: 18 }}>
+            Выбранный вами тариф: {`${tariff?.title}`}
+          </Typography>
+          <Typography style={{ textAlign: 'center', margin: '10px 0px 20px 0px', fontSize: 18 }}>
+            Сумма к оплате: {`${tariff?.sum?.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1 ')}`} тг
+          </Typography>
+          <Form.Item name="tariffId" hidden initialValue={tariff?.id} rules={[{ required: true }]}>
+            <Input type="number"></Input>
+          </Form.Item>
+          <Form.Item
+            name="tel"
+            label=" Введите номер, который зарегистрирован в Kaspi Bank, по этому номеру мы вышлем счет на оплату"
+            rules={[{ required: true }]}
+          >
+            <Input></Input>
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                Отправить заяку
+              </Button>
+              <Button
+                htmlType="button"
+                onClick={() => {
+                  form.resetFields();
+                  setTariffRegModal(false);
+                }}
+              >
+                Отменить
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
     </Layout>
   );
 };

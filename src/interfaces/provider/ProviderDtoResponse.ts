@@ -1,3 +1,4 @@
+import { TariffDto } from '../Tariff/TariffDto';
 import { FileDto } from '../file/FileDto';
 import { BusinessTypeDto } from './BusinessTypeDto';
 import { CityResponseDto } from './CityResponseDto';
@@ -14,4 +15,6 @@ export interface ProviderDtoResponse {
   providerCategory: ProviderCategoryDtoResponse;
   logotype: FileDto[];
   city: CityResponseDto;
+  balance: number;
+  tariff: TariffDto;
 }

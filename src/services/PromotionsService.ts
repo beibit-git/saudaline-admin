@@ -1,6 +1,5 @@
 import authAxios from '../common/authAxios';
 import { Constants } from '../common/constants';
-import { ProductDtoRequest } from '../interfaces/Products/ProductDtoRequest';
 import { PromotionDtoForAll } from '../interfaces/Promotions/PromotionDtoForAll';
 import { PromotionsDtoRequest } from '../interfaces/Promotions/PromotionDtoRequest';
 import { Promotions } from '../interfaces/Promotions/Promotions';

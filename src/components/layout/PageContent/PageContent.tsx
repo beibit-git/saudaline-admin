@@ -10,6 +10,7 @@ import OrderShowPage from '../../pages/OrdersPage/OrderShowPage/OrderShowPage';
 import PromotionsPage from '../../pages/PromotionPage';
 import PromotionCreationPage from '../../pages/PromotionPage/PromotionCreatePage/PromotionCreationPage';
 import PromotionShowPage from '../../pages/PromotionPage/PromotionShowPage/PromotionShowPage';
+import TariffPage from '../../pages/TariffPage';
 
 const PageContent = () => {
   return (
@@ -40,6 +41,7 @@ const PageContent = () => {
           path="/promotions/show/:id"
           render={({ match }) => <PromotionShowPage promotionId={parseInt(match.params.id)} />}
         />
+        <Route exact path="/tarif" component={TariffPage}></Route>
         {/* <Route exact path="/teachers" component={TeachersPage}></Route>
         <Route exact path="/teacher/:id" render={({ match }) => <TeacherPage isPublic={false} />} /> */}
       </Switch>

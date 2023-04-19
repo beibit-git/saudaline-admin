@@ -1,11 +1,6 @@
-import axios from 'axios';
 import authAxios from '../common/authAxios';
 import { Constants } from '../common/constants';
-import { CategoriesDtoResponse } from '../interfaces/Categories/CategoriesDtoResponse';
-import { CategoryDtoRequest } from '../interfaces/Categories/CategoryDtoRequest';
 import { PromotionProductDtoRequest } from '../interfaces/Promotions/PromotionProductDtoRequest';
-import { ProductPromotionDtoForAll } from '../interfaces/Promotions/ProductPromotionDtoForAll';
-import { ProductForPromotionDto } from '../interfaces/Promotions/ProductForPromotionDto';
 import { ProductPromotionDto } from '../interfaces/Promotions/ProductPromotionDto';
 
 export class ProductPromotionService {
@@ -13,6 +8,14 @@ export class ProductPromotionService {
 
   static createProductPromotion(productPromotion: PromotionProductDtoRequest) {
     return authAxios.post<number>('/api/v1/promotion-product/create-products-promotion', productPromotion);
+  }
+
+  static updateProductPromotion(productPromotionId: number, productPromotion: PromotionProductDtoRequest) {
+    console.log('Service:' + productPromotionId);
+    return authAxios.put<number>(
+      `/api/v1/promotion-product/update?productPromotionId=${productPromotionId}`,
+      productPromotion
+    );
   }
 
   static getOneProductPromotion(productPromotionId: number) {

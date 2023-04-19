@@ -1,9 +1,5 @@
-import axios from 'axios';
 import authAxios from '../common/authAxios';
 import { Constants } from '../common/constants';
-import { CategoriesDtoResponse } from '../interfaces/Categories/CategoriesDtoResponse';
-import { CategoryDtoRequest } from '../interfaces/Categories/CategoryDtoRequest';
-import { OrderDtoResponse } from '../interfaces/OrderDtoResponse';
 import { OrdersDtoForAllResponse } from '../interfaces/Orders/OrdersDtoForAllResponse';
 import { OrderDtoShow } from '../interfaces/Orders/OrderShow/OrderDtoShow';
 

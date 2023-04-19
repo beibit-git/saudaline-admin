@@ -3,21 +3,15 @@ import { Button, Space, Tag, Popconfirm } from 'antd';
 import { useEffect, useState } from 'react';
 import { errorNotification } from '../../../helpers/errorNotification';
 import { useNotification } from '../../../contexts/notificationContext';
-import { AcademicDegreeDtoResponse } from '../../../interfaces/AcademicDegreeDtoResponse';
 import { CategoriesDtoResponse } from '../../../interfaces/Categories/CategoriesDtoResponse';
-import { DisciplineDtoResponse } from '../../../interfaces/DisciplineDtoResponse';
-import { PersistentStateConstants } from '../../../PersistentStateConstants';
 import { CategoriesService } from '../../../services/CategoriesService';
 import { Link } from 'react-router-dom';
 import UserService from '../../../services/userService';
-import styles from './style.module.css';
 
 const useCategoriesPage = () => {
   const [shouldRerender, setShouldRerender] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<CategoriesDtoResponse[]>([]);
-  const [academicDegrees, setAcademicDegrees] = useState<AcademicDegreeDtoResponse[]>([]);
-  const [disciplines, setDisciplines] = useState<DisciplineDtoResponse[]>([]);
   const [totalCategories, setTotalCategories] = useState(0);
   const [currentPage, setCurrentPage] = useState<number | undefined>(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -109,10 +103,6 @@ const useCategoriesPage = () => {
     setLoading,
     categories,
     setCategories,
-    academicDegrees,
-    setAcademicDegrees,
-    disciplines,
-    setDisciplines,
     totalCategories,
     setTotalCategories,
     currentPage,

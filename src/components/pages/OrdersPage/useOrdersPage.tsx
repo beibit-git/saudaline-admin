@@ -1,13 +1,11 @@
 import { CheckCircleOutlined, CloseCircleOutlined, EyeOutlined } from '@ant-design/icons';
-import { Button, Space, Popconfirm, Image, Tag, Popover } from 'antd';
+import { Button, Space, Tooltip } from 'antd';
 import { useEffect, useState } from 'react';
 import { errorNotification } from '../../../helpers/errorNotification';
 import { useNotification } from '../../../contexts/notificationContext';
 import { CategoriesDtoResponse } from '../../../interfaces/Categories/CategoriesDtoResponse';
 import { Link } from 'react-router-dom';
 import UserService from '../../../services/userService';
-import { ProductsService } from '../../../services/ProductsService';
-import { ProductsDtoResponse } from '../../../interfaces/Products/ProductsDtoResponse';
 import { OrdersDtoForAllResponse } from '../../../interfaces/Orders/OrdersDtoForAllResponse';
 import { OrdersService } from '../../../services/OrdersService';
 import { OrderStatus } from './OrderStatus/OrderStatus';
@@ -127,27 +125,43 @@ const useOrdersPage = () => {
       dataIndex: 'actions',
       key: 'actions',
       width: 120,
-      render: (text: any, record: any) => (
-        <Space size="middle">
-          <Popover title="Посмотреть заказ">
-            <Link to={`/orders/show/${record.key}`}>
-              <Button>
-                <EyeOutlined />
+      render: (text: any, record: any) => {
+        const canAcceptOrder = record?.status === 'NEW';
+        const canRejectOrder = record?.status === 'NEW' || record?.status === 'APPROVED';
+        return (
+          <Space size="middle">
+            <Tooltip title="Посмотреть заказ">
+              <Link to={`/orders/show/${record.key}`}>
+                <Button>
+                  <EyeOutlined />
+                </Button>
+              </Link>
+            </Tooltip>
+            <Tooltip title="Принять заказ">
+              <Button
+                type="primary"
+                ghost
+                onClick={() => onAcceptOrder(record.key)}
+                loading={loadings[0]}
+                disabled={!canAcceptOrder}
+              >
+                <CheckCircleOutlined twoToneColor="#2ECC71" />
               </Button>
-            </Link>
-          </Popover>
-          <Popover title="Принять заказ">
-            <Button type="primary" ghost onClick={() => onAcceptOrder(record.key)} loading={loadings[0]}>
-              <CheckCircleOutlined twoToneColor="#2ECC71" />
-            </Button>
-          </Popover>
-          <Popover title="Отклонять заказ">
-            <Button type="default" danger onClick={() => onRejectOrder(record.key)} loading={loadings[1]}>
-              <CloseCircleOutlined twoToneColor="#ff0000" />
-            </Button>
-          </Popover>
-        </Space>
-      ),
+            </Tooltip>
+            <Tooltip title="Отклонять заказ">
+              <Button
+                type="default"
+                danger
+                onClick={() => onRejectOrder(record.key)}
+                loading={loadings[1]}
+                disabled={!canRejectOrder}
+              >
+                <CloseCircleOutlined twoToneColor="#ff0000" />
+              </Button>
+            </Tooltip>
+          </Space>
+        );
+      },
     },
   ];
 

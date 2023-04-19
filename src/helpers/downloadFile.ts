@@ -58,7 +58,6 @@ export function downloadFile(
   params?: any
 ) {
   if (params) {
-    console.log(params);
     for (const key of Object.keys(params)) {
       if (!params[key]) {
         delete params[key];

@@ -11,7 +11,6 @@ export class ProductsService {
   //   }
 
   static getProducts(params: any) {
-    console.log(params);
     for (const key of Object.keys(params)) {
       if (!params[key]) {
         delete params[key];
