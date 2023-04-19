@@ -25,3 +25,22 @@
   display: flex;
   flex-direction: row;
 }
+
+.selectProduct,
+.ant-select-selector,
+.ant-select-selection-search,
+.ant-select-selection-placeholder,
+.ant-select-item-option-content {
+  height: 50px;
+}
+
+.optionProducts {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.optionProducts span {
+  padding: 0 5px 0 5px;
+}

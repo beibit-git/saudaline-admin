@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Typography, Modal, Form, InputNumber, Radio, Select, Space, Col, Image } from 'antd';
+import { Button, Typography, Modal, Form, InputNumber, Radio, Select, Space, Col, Image, Spin } from 'antd';
 import { errorNotification } from '../../../../helpers/errorNotification';
 import { useNotification } from '../../../../contexts/notificationContext';
 import { Constants } from '../../../../common/constants';
@@ -12,6 +12,7 @@ import { ProductsDtoResponse } from '../../../../interfaces/Products/ProductsDto
 import { PromotionProductDtoRequest } from '../../../../interfaces/Promotions/PromotionProductDtoRequest';
 import { ProductPromotionService } from '../../../../services/ProductPromotionService';
 import { successNotification } from '../../../../helpers/successNotification';
+
 const { Option } = Select;
 const { Text } = Typography;
 
@@ -39,6 +40,7 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
     onClose();
     productPromotionId = undefined;
     setIsModalOpen(false);
+    form.resetFields();
   };
 
   const handleOk = () => {
@@ -67,6 +69,7 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
         .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
         .finally(() => setLoading(false));
     }
+    setLoading(false);
   }, [productPromotionId, shouldRerender, openModal]);
 
   React.useEffect(() => {
@@ -99,12 +102,17 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
   }, [categoryId, subCategoryId]);
 
   const onFinish = (promotionProduct: PromotionProductDtoRequest) => {
-    console.log(promotionProduct);
-    // setLoading(true);
-    // ProductPromotionService.createProductPromotion(promotionProduct)
-    //   .then(() => successNotification('Данные успешно сохранены'))
-    //   .catch((err) => errorNotification('Не удалось сохранить данные', err.response?.status))
-    //   .finally(() => setLoading(false));
+    setLoading(true);
+    ProductPromotionService.createProductPromotion(promotionProduct)
+      .then(() => successNotification('Данные успешно сохранены'))
+      .catch((err) => {
+        if (err.response.data.message == 'This product is already discounted.') {
+          errorNotification('Этот товар уже со скидкой.');
+        } else {
+          errorNotification('Не удалось сохранить данные', err.response?.status);
+        }
+      })
+      .finally(() => setLoading(false));
     // productId
     //   ? ProductsService.updateProduct(productId, product)
     //       .then(() => successNotification('Данные успешно обновлены'))
@@ -123,23 +131,122 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
       onCancel={handleCancel}
       footer={false}
     >
-      {productPromotionId ? (
+      {isLoading ? (
+        <Spin />
+      ) : (
         <>
-          {form.getFieldValue('product') ? (
+          {productPromotionId ? (
+            <>
+              {form.getFieldValue('product') ? (
+                <Form form={form} layout="vertical" name="userForm" onFinish={onFinish}>
+                  {/* {console.log(form.getFieldValue('product'))} */}
+                  <Image
+                    src={form.getFieldValue('product')?.mainPhoto[0]?.url}
+                    title={form.getFieldValue('product')?.title}
+                    width={'30%'}
+                  />
+                  <Typography>{form.getFieldValue('product')?.title}</Typography>
+                  <Form.Item
+                    hidden
+                    label="Товар"
+                    initialValue={form.getFieldValue('product')?.id}
+                    name="product"
+                  ></Form.Item>
+                  <Form.Item name="discount" label="Скидка" rules={[{ required: true }]}>
+                    <InputNumber />
+                  </Form.Item>
+                  <Form.Item hidden initialValue={promotionId} name="promotion"></Form.Item>
+                  <Form.Item
+                    label="Сделать активным"
+                    name="isActive"
+                    valuePropName="defaultValue"
+                    rules={[
+                      {
+                        required: true,
+                      },
+                    ]}
+                  >
+                    <Radio.Group>
+                      <Radio value="true"> Да</Radio>
+                      <Radio value="false"> Нет </Radio>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item>
+                    <Space>
+                      <Button type="primary" htmlType="submit">
+                        Сохранить
+                      </Button>
+                      <Button
+                        htmlType="button"
+                        onClick={() => {
+                          form.resetFields();
+                          onClose();
+                          setIsModalOpen(false);
+                        }}
+                      >
+                        Отменить
+                      </Button>
+                    </Space>
+                  </Form.Item>
+                </Form>
+              ) : null}
+            </>
+          ) : (
             <Form form={form} layout="vertical" name="userForm" onFinish={onFinish}>
-              {/* {console.log(form.getFieldValue('product'))} */}
-              <Image
-                src={form.getFieldValue('product')?.mainPhoto[0]?.url}
-                title={form.getFieldValue('product')?.title}
-                width={'30%'}
-              />
-              <Typography>{form.getFieldValue('product')?.title}</Typography>
+              <Col span={24}>
+                <Text>Категория</Text>
+                <Select
+                  showSearch
+                  placeholder="Категория"
+                  optionFilterProp="children"
+                  onSelect={(value: number) => setCategoryId(value)}
+                  style={{ width: '100%' }}
+                >
+                  {categories?.map((category) => (
+                    <Option key={category.id} value={category.id}>
+                      {category.title}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
+              <Col span={24} style={{ marginTop: '10px', marginBottom: '10px' }}>
+                <Text>Подкатегория</Text>
+                <Select
+                  showSearch
+                  placeholder="Подкатегория"
+                  optionFilterProp="children"
+                  onSelect={(value: number) => setSubCategoryId(value)}
+                  style={{ width: '100%' }}
+                >
+                  {subCategories?.map((subCategory) => (
+                    <Option key={subCategory.id} value={subCategory.id}>
+                      {subCategory.title}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
               <Form.Item
-                hidden
                 label="Товар"
-                initialValue={form.getFieldValue('product')?.id}
                 name="product"
-              ></Form.Item>
+                rules={[
+                  {
+                    required: true,
+                    message: 'Выберите товар',
+                  },
+                ]}
+              >
+                <Select showSearch optionFilterProp="children" placeholder="Товар" className="selectProduct">
+                  {products ? (
+                    products?.map((product) => (
+                      <Option key={product.id} value={product.id} className="optionProducts">
+                        {product.title}
+                      </Option>
+                    ))
+                  ) : (
+                    <Option>Нет товар</Option>
+                  )}
+                </Select>
+              </Form.Item>
               <Form.Item name="discount" label="Скидка" rules={[{ required: true }]}>
                 <InputNumber />
               </Form.Item>
@@ -147,7 +254,6 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
               <Form.Item
                 label="Сделать активным"
                 name="isActive"
-                valuePropName="defaultValue"
                 rules={[
                   {
                     required: true,
@@ -164,114 +270,14 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
                   <Button type="primary" htmlType="submit">
                     Сохранить
                   </Button>
-                  <Button
-                    htmlType="button"
-                    onClick={() => {
-                      form.resetFields();
-                      onClose();
-                      setIsModalOpen(false);
-                    }}
-                  >
+                  <Button htmlType="button" onClick={() => handleCancel()}>
                     Отменить
                   </Button>
                 </Space>
               </Form.Item>
             </Form>
-          ) : null}
+          )}
         </>
-      ) : (
-        <Form form={form} layout="vertical" name="userForm" onFinish={onFinish}>
-          <Col span={24}>
-            <Text>Категория</Text>
-            <Select
-              showSearch
-              placeholder="Категория"
-              optionFilterProp="children"
-              onSelect={(value: number) => setCategoryId(value)}
-              style={{ width: '100%' }}
-            >
-              {categories?.map((category) => (
-                <Option key={category.id} value={category.id}>
-                  {category.title}
-                </Option>
-              ))}
-            </Select>
-          </Col>
-          <Col span={24} style={{ marginTop: '10px', marginBottom: '10px' }}>
-            <Text>Подкатегория</Text>
-            <Select
-              showSearch
-              placeholder="Подкатегория"
-              optionFilterProp="children"
-              onSelect={(value: number) => setSubCategoryId(value)}
-              style={{ width: '100%' }}
-            >
-              {subCategories?.map((subCategory) => (
-                <Option key={subCategory.id} value={subCategory.id}>
-                  {subCategory.title}
-                </Option>
-              ))}
-            </Select>
-          </Col>
-          <Form.Item
-            label="Товар"
-            name="product"
-            rules={[
-              {
-                required: true,
-                message: 'Выберите товар',
-              },
-            ]}
-          >
-            <Select showSearch optionFilterProp="children" placeholder="Товар">
-              {products ? (
-                products?.map((product) => (
-                  <Option key={product.id} value={product.id}>
-                    {product.title}
-                  </Option>
-                ))
-              ) : (
-                <Option>Нет товар</Option>
-              )}
-              {}
-            </Select>
-          </Form.Item>
-          <Form.Item name="discount" label="Скидка" rules={[{ required: true }]}>
-            <InputNumber />
-          </Form.Item>
-          <Form.Item hidden initialValue={promotionId} name="promotion"></Form.Item>
-          <Form.Item
-            label="Сделать активным"
-            name="isActive"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Radio.Group>
-              <Radio value="true"> Да</Radio>
-              <Radio value="false"> Нет </Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                Сохранить
-              </Button>
-              <Button
-                htmlType="button"
-                onClick={() => {
-                  form.resetFields();
-                  onClose();
-                  setIsModalOpen(false);
-                }}
-              >
-                Отменить
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
       )}
     </Modal>
   );
