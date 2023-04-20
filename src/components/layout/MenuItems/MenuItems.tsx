@@ -57,6 +57,38 @@ const MenuItems = () => {
           </Menu.Item>
         </Menu>
       </AuthenticatedContent>
+      <AuthenticatedContent role={'ROLE_ADMIN'} type={'baseRole'}>
+        <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
+          <Menu.Item key="/tariff-requests" icon={<MedicineBoxFilled />}>
+            <Link to="/tariff-requests"></Link>
+            Запросы тарифов
+          </Menu.Item>
+        </Menu>
+        <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
+          <Menu.Item key="/products" icon={<MedicineBoxFilled />}>
+            <Link to="/products"></Link>
+            Товары
+          </Menu.Item>
+        </Menu>
+        <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
+          <Menu.Item key="/orders" icon={<MedicineBoxFilled />}>
+            <Link to="/orders"></Link>
+            Заказы
+          </Menu.Item>
+        </Menu>
+        <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
+          <Menu.Item key="/promotions" icon={<MedicineBoxFilled />}>
+            <Link to="/promotions"></Link>
+            Акции
+          </Menu.Item>
+        </Menu>
+        <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
+          <Menu.Item key="/tarif" icon={<MedicineBoxFilled />}>
+            <Link to="/tarif"></Link>
+            Мой тариф
+          </Menu.Item>
+        </Menu>
+      </AuthenticatedContent>
 
       <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
         <Menu.Item key={uuidv4()} icon={<LogoutOutlined />} onClick={UserService.logOut}>

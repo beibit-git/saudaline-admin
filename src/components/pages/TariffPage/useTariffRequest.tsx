@@ -6,7 +6,7 @@ import { DateField } from '../../../helpers/DateField';
 import { TransactionRefillService } from '../../../services/TransactionRefillService';
 import { TariffRequestDto } from '../../../interfaces/Tariff/TariffRequestDto';
 import { TariffRequestService } from '../../../services/TariffRequestService';
-import { TariffStatus } from './OrderStatus';
+import { TariffStatus } from './TariffStatus';
 
 const useTariffRequest = () => {
   const [shouldRerender, setShouldRerender] = useState(false);

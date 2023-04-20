@@ -4,13 +4,14 @@ import CategoriesPage from '../../pages/CategoriesPage';
 import CategoryCreationPage from '../../pages/CategoriesPage/CategoryCreationPage/CategoryCreationPage';
 import ProductsPage from '../../pages/ProductPage';
 import ProductCreationPage from '../../pages/ProductPage/ProductCreationPage/ProductCreationPage';
-import UserPage from '../../pages/UserPage';
 import OrdersPage from '../../pages/OrdersPage';
 import OrderShowPage from '../../pages/OrdersPage/OrderShowPage/OrderShowPage';
 import PromotionsPage from '../../pages/PromotionPage';
 import PromotionCreationPage from '../../pages/PromotionPage/PromotionCreatePage/PromotionCreationPage';
 import PromotionShowPage from '../../pages/PromotionPage/PromotionShowPage/PromotionShowPage';
 import TariffPage from '../../pages/TariffPage';
+import TariffRequestsPage from '../../pages/TariffRequestsPage';
+import UserPage from '../../pages';
 
 const PageContent = () => {
   return (
@@ -42,6 +43,7 @@ const PageContent = () => {
           render={({ match }) => <PromotionShowPage promotionId={parseInt(match.params.id)} />}
         />
         <Route exact path="/tarif" component={TariffPage}></Route>
+        <Route exact path="/tariff-requests" component={TariffRequestsPage}></Route>
         {/* <Route exact path="/teachers" component={TeachersPage}></Route>
         <Route exact path="/teacher/:id" render={({ match }) => <TeacherPage isPublic={false} />} /> */}
       </Switch>

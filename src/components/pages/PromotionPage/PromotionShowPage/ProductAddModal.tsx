@@ -10,6 +10,7 @@ import { ProductsDtoResponse } from '../../../../interfaces/Products/ProductsDto
 import { PromotionProductDtoRequest } from '../../../../interfaces/Promotions/PromotionProductDtoRequest';
 import { ProductPromotionService } from '../../../../services/ProductPromotionService';
 import { successNotification } from '../../../../helpers/successNotification';
+import UserService from '../../../../services/userService';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -63,7 +64,9 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
   }, [productPromotionId, shouldRerender, openModal]);
 
   React.useEffect(() => {
-    CategoriesService.getAllCategories()
+    CategoriesService.getCategories({
+      userId: UserService.getCurrentUser().id,
+    })
       .then(({ data }) => {
         setCategories(data.list);
       })
@@ -77,7 +80,9 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
         }
       })
       .catch((err) => errorNotification('Не удалось получить данные', err.response?.status));
-    ProductsService.getProducts({})
+    ProductsService.getProducts({
+      userId: UserService.getCurrentUser().id,
+    })
       .then(({ data }) => {
         if (data.list == null) {
           setProducts([]);
@@ -98,7 +103,7 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
         }
       })
       .catch((err) => errorNotification('Не удалось получить данные', err.response?.status));
-    ProductsService.getProducts({ categoryId, subCategoryId })
+    ProductsService.getProducts({ categoryId, subCategoryId, userId: UserService.getCurrentUser().id })
       .then(({ data }) => {
         if (data.list == null) {
           setProducts([]);
@@ -136,7 +141,7 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
 
   return (
     <Modal
-      title={productPromotionId ? 'Добавьте товар в акцию' : 'Изменить скидку на продукт'}
+      title={productPromotionId ? 'Изменить скидку на продукт' : 'Добавьте товар в акцию'}
       open={isModalOpen}
       onCancel={handleCancel}
       footer={false}

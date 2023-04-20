@@ -31,10 +31,8 @@ class UserService {
     return authAxios.get<ProviderDtoResponse>(`/api/v1/provider/get-by-userid${userId}`);
   }
 
-  static getUserInfo(userId?: number) {
-    return axios.get<UserDtoResponse>(
-      `${this.baseURL}/astanait-authorization-module/api/v1/auth/get-user-by-id?user_id=${userId}`
-    );
+  static getUserInfo() {
+    return authAxios.get<UserDtoResponse>(`${this.baseURL}/api/v1/auth/user-info`);
   }
 }
 export default UserService;

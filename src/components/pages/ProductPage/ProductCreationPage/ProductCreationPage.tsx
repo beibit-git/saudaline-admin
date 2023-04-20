@@ -66,13 +66,15 @@ const ProductCreationPage = ({ productId }: Props) => {
       })
       .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
       .finally(() => setLoading(false));
-    CategoriesService.getAllCategories()
+    CategoriesService.getCategories({ userId: UserService.getCurrentUser().id })
       .then(({ data }) => {
         setCategories(data.list);
       })
       .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
       .finally(() => setLoading(false));
-    SubCategoriesService.getAllSubCategories()
+    SubCategoriesService.getSubCategories({
+      userId: UserService.getCurrentUser().id,
+    })
       .then(({ data }) => {
         setSubCategories(data.list);
       })
@@ -188,15 +190,7 @@ const ProductCreationPage = ({ productId }: Props) => {
               ))}
             </Select>
           </Form.Item>
-          <Form.Item
-            label="Подкатегория"
-            name="subcategory"
-            rules={[
-              {
-                message: 'Выберите подкатегория товара',
-              },
-            ]}
-          >
+          <Form.Item label="Подкатегория" name="subcategory">
             <Select showSearch placeholder="Подкатегория">
               {subCategories?.map((subCategory) => (
                 <Option key={subCategory.id} value={subCategory.id}>

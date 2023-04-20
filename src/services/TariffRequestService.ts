@@ -1,5 +1,6 @@
 import authAxios from '../common/authAxios';
 import { Constants } from '../common/constants';
+import { TariffAddRequest } from '../interfaces/Tariff/TariffAddRequest';
 import { TariffRequestDto } from '../interfaces/Tariff/TariffRequestDto';
 
 export class TariffRequestService {
@@ -14,5 +15,17 @@ export class TariffRequestService {
     return authAxios.get<{ list: TariffRequestDto[]; total_number: number }>('/api/v1/tariff-request/get-all', {
       params,
     });
+  }
+
+  static createTariffRequest(tariffRequest: TariffAddRequest) {
+    return authAxios.post(`/api/v1/tariff-request?tariffId=${tariffRequest.tariffId}&tel=${tariffRequest.tel}`);
+  }
+
+  static confirmTariff(tariffRequestId: number) {
+    return authAxios.patch(`/api/v1/tariff-request/set-paid?tariffRequestId=${tariffRequestId}`);
+  }
+
+  static dontConfirmTariff(tariffRequestId: number) {
+    return authAxios.patch(`/api/v1/tariff-request/set-unpaid?tariffRequestId=${tariffRequestId}`);
   }
 }

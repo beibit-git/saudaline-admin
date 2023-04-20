@@ -1,10 +1,11 @@
-import { RoleDtoResponse } from "./RoleDtoResponse";
+// import { RoleDtoResponse } from "./RoleDtoResponse";
 
-export interface UserDtoResponse{
-    id: number;
-    username: string;
-    name: string;
-    surname: string;
-    baseRole: string;
-    roleList: RoleDtoResponse[];
+export interface UserDtoResponse {
+  id: number;
+  name: string;
+  login: string;
+  patronymic: string;
+  surname: string;
+  email: string;
+  phoneNumber: string;
 }

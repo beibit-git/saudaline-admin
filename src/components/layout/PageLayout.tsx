@@ -18,7 +18,14 @@ import {
   Form,
   Input,
 } from 'antd';
-import { UserOutlined, LogoutOutlined, DownOutlined, MenuOutlined } from '@ant-design/icons';
+import {
+  UserOutlined,
+  LogoutOutlined,
+  DownOutlined,
+  MenuOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+} from '@ant-design/icons';
 
 import MenuItems from './MenuItems';
 import PageContent from './PageContent';
@@ -32,6 +39,9 @@ import { TariffListDto } from '../../interfaces/Tariff/TariffListDto';
 import { TariffService } from '../../services/TariffService';
 import { errorNotification } from '../../helpers/errorNotification';
 import { TariffAddRequest } from '../../interfaces/Tariff/TariffAddRequest';
+import { TariffRequestService } from '../../services/TariffRequestService';
+import grantPermission from '../../helpers/grantPermission';
+import AuthenticatedContent from '../../common/AuthenticatedContent';
 
 const { Header, Content, Sider } = Layout;
 const PUBLIC_URL = process.env.PUBLIC_URL;
@@ -39,12 +49,16 @@ const PUBLIC_URL = process.env.PUBLIC_URL;
 const PageLayout = () => {
   const [profile, setProfile] = useState<any>();
   const [provider, setProvider] = useState<any>();
+  const [user, setUser] = useState<any>();
   const [tariffList, setTariffList] = useState<TariffListDto[]>([]);
   const [tariff, setTariff] = useState<TariffListDto>();
   const [isLoading, setLoading] = useState(false);
   const [visible, setVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tariffRegModal, setTariffRegModal] = useState(false);
+  const [tariffOkModal, setTariffOkModal] = useState(false);
+  const [tariffErrorModal, setTariffErrorModal] = useState(false);
+  const [tariffLoadingModal, setTariffLoadingModal] = useState(false);
   const [isDarkMode] = useTheme();
   const { width } = useWindowDimensions();
 
@@ -74,31 +88,46 @@ const PageLayout = () => {
 
   useEffect(() => {
     // ДЛЯ РЕШЕНИЯ ПРОБЛЕМЫ С ПРОСРОЧКОЙ ТОКЕНА ДЛЯ ВХОДА ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
-    UserService.getProfileByPrincipal();
-    UserService.getProfileByPrincipal().then((response) => {
-      setProvider(response.data);
-    });
-    setProfile(UserService.getCurrentUser());
+    if (grantPermission('ROLE_ADMIN', 'baseRole')) {
+      UserService.getUserInfo();
+      setProfile(UserService.getCurrentUser());
+    }
+    if (grantPermission('ROLE_PROVIDER', 'baseRole')) {
+      UserService.getProfileByPrincipal();
+      UserService.getProfileByPrincipal().then((response) => {
+        setProvider(response.data);
+      });
+      setProfile(UserService.getCurrentUser());
+    }
   }, []);
 
   useEffect(() => {
-    if (provider?.tariff === null || provider?.balance === 0) {
-      setLoading(true);
-      TariffService.getTariffList()
-        .then((response) => {
-          setTariffList(response.data);
-        })
-        .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
-        .finally(() => setLoading(false));
-      setIsModalOpen(true);
-    } else {
-      setIsModalOpen(false);
+    if (grantPermission('ROLE_PROVIDER', 'baseRole')) {
+      if (provider?.tariff === null || provider?.balance === 0) {
+        setLoading(true);
+        TariffService.getTariffList()
+          .then((response) => {
+            setTariffList(response.data);
+          })
+          .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
+          .finally(() => setLoading(false));
+        setIsModalOpen(true);
+      }
     }
-  }, [provider]);
+  }, [provider?.tariff, provider?.balance]);
 
   const onFinish = (tariffAdd: TariffAddRequest) => {
-    setLoading(true);
-    console.log(tariffAdd);
+    setTariffLoadingModal(true);
+    if (tariffAdd !== null) {
+      TariffRequestService.createTariffRequest(tariffAdd)
+        .then(() => setTariffOkModal(true))
+        .catch(() => {
+          setTariffErrorModal(true);
+        })
+        .finally(() => {
+          setTariffLoadingModal(false);
+        });
+    }
   };
 
   return (
@@ -135,10 +164,12 @@ const PageLayout = () => {
             </Col>
             <Col flex={'auto'}></Col>
             <Col flex={0}>
-              <Typography.Text style={{ color: 'white', marginRight: 10 }}>Мой баланс:</Typography.Text>
-              <Tag color="processing" style={{ fontSize: 14, fontWeight: 600, marginRight: 10 }}>
-                {`${provider?.balance?.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1 ')}`}
-              </Tag>
+              <AuthenticatedContent role={'ROLE_PROVIDER'} type={'baseRole'}>
+                <Typography.Text style={{ color: 'white', marginRight: 10 }}>Мой баланс:</Typography.Text>
+                <Tag color="processing" style={{ fontSize: 14, fontWeight: 600, marginRight: 10 }}>
+                  {`${provider?.balance?.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1 ')}`}
+                </Tag>
+              </AuthenticatedContent>
               <Space>
                 <Dropdown overlay={popoverContent} trigger={['click']} overlayStyle={{ padding: '10px 0' }}>
                   <a>
@@ -236,6 +267,66 @@ const PageLayout = () => {
             </Space>
           </Form.Item>
         </Form>
+      </Modal>
+      <Modal
+        closable={true}
+        title="Ваша заявка успешно отправлено!"
+        open={tariffOkModal}
+        footer={null}
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        {isLoading ? (
+          <Spin />
+        ) : (
+          <>
+            <CheckCircleOutlined style={{ fontSize: 56, marginBottom: 20 }} twoToneColor="#52c41a" />
+            <Typography.Title level={4}>
+              В ближайшее время с вами свяжется наш менеджер, вы получите счет на оплату.
+            </Typography.Title>
+            <Typography.Title level={5}>После успешной оплаты вам будет доступен наш сервис</Typography.Title>
+            <Button
+              onClick={() => {
+                setTariffOkModal(false);
+                form.resetFields();
+                setTariffRegModal(false);
+              }}
+            >
+              OK
+            </Button>
+          </>
+        )}
+      </Modal>
+      <Modal
+        title="Произошла ошибка!"
+        open={tariffErrorModal}
+        footer={null}
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        <CloseCircleOutlined style={{ fontSize: 56, marginBottom: 20 }} />
+        <Typography.Title level={4}>Ошибка в запросе. Пожалуйста, повторите запрос!</Typography.Title>
+        <Button
+          onClick={() => {
+            setTariffErrorModal(false);
+            form.resetFields();
+            setTariffRegModal(false);
+          }}
+        >
+          OK
+        </Button>
+      </Modal>
+      <Modal
+        closable={true}
+        open={tariffLoadingModal}
+        footer={null}
+        style={{
+          textAlign: 'center',
+        }}
+      >
+        <Spin />
       </Modal>
     </Layout>
   );
