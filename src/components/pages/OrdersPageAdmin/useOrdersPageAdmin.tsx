@@ -11,7 +11,7 @@ import { OrdersService } from '../../../services/OrdersService';
 import { OrderStatus } from './OrderStatus/OrderStatus';
 import { DateField } from '../../../helpers/DateField';
 
-const useOrdersPage = () => {
+const useOrdersPageAdmin = () => {
   const [shouldRerender, setShouldRerender] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadings, setLoadings] = useState<boolean[]>([]);
@@ -31,7 +31,6 @@ const useOrdersPage = () => {
     const delayedSearch = setTimeout(() => {
       OrdersService.getOrders({
         page: currentPage,
-        userId: UserService.getCurrentUser().id,
         categoryId: selectedCategory,
         subcategoryId: selectedSubCategory,
         keyword: searchQuery,
@@ -121,6 +120,12 @@ const useOrdersPage = () => {
       render: (record: any) => <> {record - Math.round((record / 100) * 1)} ₸</>,
     },
     {
+      title: 'Поставщик',
+      dataIndex: 'provider',
+      key: 'provider',
+      render: (record: any) => <> {record}</>,
+    },
+    {
       title: 'Действия',
       dataIndex: 'actions',
       key: 'actions',
@@ -131,13 +136,13 @@ const useOrdersPage = () => {
         return (
           <Space size="middle">
             <Tooltip title="Посмотреть заказ">
-              <Link to={`/orders/show/${record.key}`}>
+              <Link to={`/order-admin/show/${record.key}`}>
                 <Button>
                   <EyeOutlined />
                 </Button>
               </Link>
             </Tooltip>
-            <Tooltip title="Принять заказ">
+            {/* <Tooltip title="Принять заказ">
               <Button
                 type="primary"
                 ghost
@@ -147,8 +152,8 @@ const useOrdersPage = () => {
               >
                 <CheckCircleOutlined twoToneColor="#2ECC71" />
               </Button>
-            </Tooltip>
-            <Tooltip title="Отклонять заказ">
+            </Tooltip> */}
+            {/* <Tooltip title="Отклонять заказ">
               <Button
                 type="default"
                 danger
@@ -158,7 +163,7 @@ const useOrdersPage = () => {
               >
                 <CloseCircleOutlined twoToneColor="#ff0000" />
               </Button>
-            </Tooltip>
+            </Tooltip> */}
           </Space>
         );
       },
@@ -192,4 +197,4 @@ const useOrdersPage = () => {
   };
 };
 
-export default useOrdersPage;
+export default useOrdersPageAdmin;

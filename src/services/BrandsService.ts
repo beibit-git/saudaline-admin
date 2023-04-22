@@ -10,6 +10,9 @@ export class BrandsService {
   static getBrands() {
     return authAxios.get<{ list: BrandsDtoResponse[]; total_number: number }>('/api/v1/brands/get-all-brands');
   }
+  static getAll() {
+    return authAxios.get<BrandsDtoResponse[]>('/api/v1/brands/get-all');
+  }
 
   // static getProducts(params: any) {
   //   for (const key of Object.keys(params)) {

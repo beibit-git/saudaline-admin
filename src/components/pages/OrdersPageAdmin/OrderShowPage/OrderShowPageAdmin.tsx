@@ -48,7 +48,7 @@ interface Props {
   orderId?: number;
 }
 
-const OrderShowPage = ({ orderId }: Props) => {
+const OrderShowPageAdmin = ({ orderId }: Props) => {
   const apiUrl = Constants.API_BASE_URL;
   const [shouldRerender, setShouldRerender] = useState(false);
   const [isLoading, setLoading] = useState(false);
@@ -110,9 +110,6 @@ const OrderShowPage = ({ orderId }: Props) => {
         });
       });
   };
-
-  const canAcceptOrder = order?.status === 'NEW';
-  const canRejectOrder = order?.status === 'NEW' || order?.status === 'APPROVED';
 
   const courierInfoBox = (text: string, icon: ReactNode, value?: ReactNode) => (
     <CourierInfoBox>
@@ -248,7 +245,7 @@ const OrderShowPage = ({ orderId }: Props) => {
             <Text style={{ fontSize: '16px' }}>
               Статус заказа: <OrderStatus status={order?.status} />
             </Text>
-            <Button
+            {/* <Button
               disabled={!canAcceptOrder}
               key="accept"
               icon={<CheckCircleOutlined />}
@@ -268,7 +265,7 @@ const OrderShowPage = ({ orderId }: Props) => {
               loading={loadings[1]}
             >
               Отклонять
-            </Button>
+            </Button> */}
           </div>
         </Title>
       </Col>
@@ -358,4 +355,4 @@ const OrderShowPage = ({ orderId }: Props) => {
   );
 };
 
-export default OrderShowPage;
+export default OrderShowPageAdmin;

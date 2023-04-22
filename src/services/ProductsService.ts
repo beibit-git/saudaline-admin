@@ -22,6 +22,10 @@ export class ProductsService {
     });
   }
 
+  static getAll() {
+    return authAxios.get<ProductsDtoResponse[]>('/api/v1/product/get-all');
+  }
+
   static deleteProduct(productId: number) {
     return authAxios.delete(`/api/v1/product/delete-product?id=${productId}`);
   }
@@ -38,5 +42,14 @@ export class ProductsService {
   // Возвращает ID только что созданной дисциплины
   static createProduct(product: ProductDtoRequest) {
     return authAxios.post<number>('/api/v1/product/create-product', product);
+  }
+
+  static createProductByAdmin(product: ProductDtoRequest) {
+    return authAxios.post<number>('/api/v1/product/create-product-by-admin', product);
+  }
+
+  // status 200
+  static updateProductByAdmin(productId: number, updatedProduct: ProductDtoRequest) {
+    return authAxios.put(`/api/v1/product/update-product-by-admin?productId=${productId}`, updatedProduct);
   }
 }

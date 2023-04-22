@@ -13,6 +13,10 @@ export class SubCategoriesService {
     );
   }
 
+  static getAll() {
+    return authAxios.get<SubCategoriesDtoResponse[]>('/api/v1/subcategory/get-all');
+  }
+
   static getSubCategories(params: any) {
     for (const key of Object.keys(params)) {
       if (!params[key]) {

@@ -12,6 +12,12 @@ import PromotionShowPage from '../../pages/PromotionPage/PromotionShowPage/Promo
 import TariffPage from '../../pages/TariffPage';
 import TariffRequestsPage from '../../pages/TariffRequestsPage';
 import UserPage from '../../pages';
+import OrdersPageAdmin from '../../pages/OrdersPageAdmin/OrdersPageAdmin';
+import OrderShowPageAdmin from '../../pages/OrdersPageAdmin/OrderShowPage';
+import ProductsPageAdmin from '../../pages/ProductPageAdmin';
+import ProductCreationPageAdmin from '../../pages/ProductPageAdmin/ProductCreationPageAdmin';
+import ProviderPageAdmin from '../../pages/ProviderPageAdmin';
+import CustomerPageAdmin from '../../pages/CustomePageAdmin';
 
 const PageContent = () => {
   return (
@@ -44,6 +50,19 @@ const PageContent = () => {
         />
         <Route exact path="/tarif" component={TariffPage}></Route>
         <Route exact path="/tariff-requests" component={TariffRequestsPage}></Route>
+        <Route exact path="/order-admin" component={OrdersPageAdmin}></Route>
+        <Route
+          path="/order-admin/show/:id"
+          render={({ match }) => <OrderShowPageAdmin orderId={parseInt(match.params.id)} />}
+        />
+        <Route exact path="/products-admin" component={ProductsPageAdmin}></Route>
+        <Route exact path="/products-admin/create" component={ProductCreationPageAdmin}></Route>
+        <Route
+          path="/products-admin/edit/:id"
+          render={({ match }) => <ProductCreationPageAdmin productId={parseInt(match.params.id)} />}
+        />
+        <Route exact path="/providers" component={ProviderPageAdmin}></Route>
+        <Route exact path="/customers" component={CustomerPageAdmin}></Route>
         {/* <Route exact path="/teachers" component={TeachersPage}></Route>
         <Route exact path="/teacher/:id" render={({ match }) => <TeacherPage isPublic={false} />} /> */}
       </Switch>

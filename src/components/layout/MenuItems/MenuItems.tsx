@@ -65,18 +65,30 @@ const MenuItems = () => {
           </Menu.Item>
         </Menu>
         <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
-          <Menu.Item key="/products" icon={<MedicineBoxFilled />}>
-            <Link to="/products"></Link>
+          <Menu.Item key="/products-admin" icon={<MedicineBoxFilled />}>
+            <Link to="/products-admin"></Link>
             Товары
           </Menu.Item>
         </Menu>
         <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
-          <Menu.Item key="/orders" icon={<MedicineBoxFilled />}>
-            <Link to="/orders"></Link>
+          <Menu.Item key="/order-admin" icon={<MedicineBoxFilled />}>
+            <Link to="/order-admin"></Link>
             Заказы
           </Menu.Item>
         </Menu>
         <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
+          <Menu.Item key="/providers" icon={<MedicineBoxFilled />}>
+            <Link to="/providers"></Link>
+            Поставщики
+          </Menu.Item>
+        </Menu>
+        <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
+          <Menu.Item key="/customers" icon={<MedicineBoxFilled />}>
+            <Link to="/customers"></Link>
+            Магазины
+          </Menu.Item>
+        </Menu>
+        {/* <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
           <Menu.Item key="/promotions" icon={<MedicineBoxFilled />}>
             <Link to="/promotions"></Link>
             Акции
@@ -87,7 +99,7 @@ const MenuItems = () => {
             <Link to="/tarif"></Link>
             Мой тариф
           </Menu.Item>
-        </Menu>
+        </Menu> */}
       </AuthenticatedContent>
 
       <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>

@@ -13,6 +13,10 @@ export class CategoriesService {
     );
   }
 
+  static getAll() {
+    return authAxios.get<CategoriesDtoResponse[]>('/api/v1/categories/get-all');
+  }
+
   static getCategories(params: any) {
     for (const key of Object.keys(params)) {
       if (!params[key]) {
