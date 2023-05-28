@@ -18,6 +18,7 @@ import ProductsPageAdmin from '../../pages/ProductPageAdmin';
 import ProductCreationPageAdmin from '../../pages/ProductPageAdmin/ProductCreationPageAdmin';
 import ProviderPageAdmin from '../../pages/ProviderPageAdmin';
 import CustomerPageAdmin from '../../pages/CustomePageAdmin';
+import ProductImport from '../../pages/ProductImport';
 
 const PageContent = () => {
   return (
@@ -63,6 +64,7 @@ const PageContent = () => {
         />
         <Route exact path="/providers" component={ProviderPageAdmin}></Route>
         <Route exact path="/customers" component={CustomerPageAdmin}></Route>
+        <Route exact path="/excel-import" component={ProductImport}></Route>
         {/* <Route exact path="/teachers" component={TeachersPage}></Route>
         <Route exact path="/teacher/:id" render={({ match }) => <TeacherPage isPublic={false} />} /> */}
       </Switch>

@@ -71,6 +71,12 @@ const MenuItems = () => {
           </Menu.Item>
         </Menu>
         <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
+          <Menu.Item key="/excel-import" icon={<MedicineBoxFilled />}>
+            <Link to="/excel-import"></Link>
+            Импорт товаров
+          </Menu.Item>
+        </Menu>
+        <Menu theme="dark" defaultSelectedKeys={['/']} mode="inline" selectedKeys={[location.pathname]}>
           <Menu.Item key="/order-admin" icon={<MedicineBoxFilled />}>
             <Link to="/order-admin"></Link>
             Заказы
