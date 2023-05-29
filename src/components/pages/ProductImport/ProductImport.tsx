@@ -1,63 +1,77 @@
-import { Button, Table, Typography, Grid } from 'antd';
-import PageWrapper from '../../../ui/PageWrapper';
-import styles from './style.module.css';
-import { Link } from 'react-router-dom';
-import { PlusOutlined } from '@ant-design/icons';
+import { ImportOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { Button, Col, Input, Modal, Row, Space, Table, Typography, Upload, UploadProps, Select, Divider } from 'antd';
+import Page from '../../../ui/Page';
 import useProductImport from './useProductImport';
-
-const { Title } = Typography;
+const { Option } = Select;
 
 const ProductImport = () => {
-  const { loading, products, totalProducts, setCurrentPage, columns, isModalOpen, setIsModalOpen } = useProductImport();
-  const breakpoint = Grid.useBreakpoint();
-  return (
-    <PageWrapper>
-      <header className={styles.header}>
-        <Title level={3} className={styles.title}>
-          Импортировать товары из файла excel
-        </Title>
-        <Link to="/products/create">
-          <Button type="primary" icon={<PlusOutlined />}>
-            Добавить товар
-          </Button>
-        </Link>
-      </header>
+  const { data, handlers } = useProductImport();
 
-      <Table
-        pagination={{ defaultPageSize: 10, total: totalProducts }}
-        dataSource={products?.map((product) => ({
-          id: product.id,
-          key: product.id,
-          title: `${product.title}`,
-          mainPhoto: product.mainPhoto[0].url,
-          category: product.category.title,
-          price: product.price,
-        }))}
-        columns={columns}
-        onChange={(pagination) => {
-          setCurrentPage(pagination.current);
-        }}
-        loading={loading}
-      />
-      {/* <Modal title={'Импорт'} open={isModalOpen} onCancel={closeModal} footer={null} width={1200}>
-        <Space direction="horizontal">
-          <Upload {...data.props}>
-            <Button size={'large'} icon={<ImportOutlined />} loading={data.loading}>
-              Импортировать Файл
+  return (
+    <Page title={'Регистрация сертификатов'}>
+      <Row style={{ marginBottom: 20 }}>
+        <Col flex={0}>
+          <Input
+            placeholder="ФИО, Номер сертификата..."
+            // onChange={(e) => handlers.searchByParameters(e.target.value)}
+            style={{ width: 300 }}
+          />
+        </Col>
+        <Col flex={'auto'}></Col>
+        <Col flex={0}>
+          <Space direction="horizontal">
+            <Button type="primary" onClick={handlers.importFromExcelFile} icon={<ImportOutlined />}>
+              Импортировать из .xlsx файла
             </Button>
-          </Upload>
-          {data.importData && (
-            <Button
-              type="primary"
-              size="large"
-              onClick={handlers.saveCertificateList}
-              loading={data.loading}
-              icon={<SaveOutlined />}
-            >
-              Сохранить
+            <Button type="primary" onClick={handlers.createCertificate} icon={<PlusOutlined />}>
+              Зарегистрировать сертификат
             </Button>
-          )}
-        </Space>
+          </Space>
+        </Col>
+      </Row>
+      <Table dataSource={data.data} columns={data.columns} bordered loading={data.loading} />
+      {/* {data.editData && (
+        <EditCertificateModal open={data.editModalOpen} onCancel={handlers.closeModal} data={data.editData} />
+      )}
+      <CreateCertificateModal open={data.createModalOpen} onCancel={handlers.closeModal} /> */}
+      <Modal title={'Импорт'} open={data.isModalOpen} onCancel={handlers.closeModal} footer={null} width={1200}>
+        <Row justify="center">
+          <Col span={2}>
+            <Typography.Text>Поставщик:</Typography.Text>{' '}
+          </Col>
+          <Col span={6}>
+            <Select showSearch placeholder="Выберите поставщика" onSelect={(e: any) => handlers.setSelectedProvider(e)}>
+              {data.providers?.map((provider) => (
+                <Option key={provider.id} value={provider.id}>
+                  {provider.name}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+        </Row>
+        <Divider plain></Divider>
+        <Row justify="center">
+          <Col>
+            <Space direction="horizontal">
+              <Upload {...data.props}>
+                <Button size={'large'} icon={<ImportOutlined />} loading={data.loading}>
+                  Импортировать Файл
+                </Button>
+              </Upload>
+              {data.importData && (
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={handlers.saveCertificateList}
+                  loading={data.loading}
+                  icon={<SaveOutlined />}
+                >
+                  Сохранить
+                </Button>
+              )}
+            </Space>
+          </Col>
+        </Row>
         {data.importData && (
           <>
             <Typography.Title level={3} type="secondary" style={{ marginTop: 20 }}>
@@ -73,8 +87,8 @@ const ProductImport = () => {
             />
           </>
         )}
-      </Modal> */}
-    </PageWrapper>
+      </Modal>
+    </Page>
   );
 };
 

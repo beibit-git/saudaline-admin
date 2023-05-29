@@ -1,81 +1,37 @@
-import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons';
-import { Button, Space, Popconfirm, Image, Tag, UploadProps, notification } from 'antd';
-import { useEffect, useState } from 'react';
+import { DeleteOutlined, DownloadOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Form, Input, notification, Popconfirm, Space, Table, Tag, Typography, UploadProps } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
 import { errorNotification } from '../../../helpers/errorNotification';
-import { useNotification } from '../../../contexts/notificationContext';
-import { CategoriesDtoResponse } from '../../../interfaces/Categories/CategoriesDtoResponse';
-import { Link } from 'react-router-dom';
-import UserService from '../../../services/userService';
-import { ProductsService } from '../../../services/ProductsService';
+import { successNotification } from '../../../helpers/successNotification';
 import { ProductsDtoResponse } from '../../../interfaces/Products/ProductsDtoResponse';
 import { FileService } from '../../../services/FileService';
-import { successNotification } from '../../../helpers/successNotification';
+import { ProviderDtoResponse } from '../../../interfaces/provider/ProviderDtoResponse';
+import { ProvidersService } from '../../../services/ProvidersService';
+import { CategoriesDtoResponse } from '../../../interfaces/Categories/CategoriesDtoResponse';
+import { SubCategoriesDtoResponse } from '../../../interfaces/Categories/SubCategoriesDtoResponse';
 
 const useProductImport = () => {
-  const [shouldRerender, setShouldRerender] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState<ProductsDtoResponse[]>([]);
-  const [categories, setCategories] = useState<CategoriesDtoResponse[]>([]);
-  const [subCategories, setSubCategories] = useState<CategoriesDtoResponse[]>([]);
-  const [totalProducts, setTotalProducts] = useState(0);
-  const [currentPage, setCurrentPage] = useState<number | undefined>(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<number | undefined>(undefined);
-  const [selectedProvider, setSelectedProvider] = useState<number | undefined>(undefined);
-  const [selectedSubCategory, setSelectedSubCategory] = useState<number | undefined>(undefined);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const { openNotification } = useNotification();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
+  const [createModalOpen, setCreateModalOpen] = useState<boolean>(false);
+  const [data, setData] = useState<ProductsDtoResponse[]>([]);
+  const [editData, setEditData] = useState<ProductsDtoResponse>();
   const [importData, setImportData] = useState<{ data: ProductsDtoResponse[]; fileName: string }>();
-
-  useEffect(() => {
-    setLoading(true);
-
-    const delayedSearch = setTimeout(() => {
-      ProductsService.getProducts({
-        page: currentPage,
-        userId: UserService.getCurrentUser().id,
-        categoryId: selectedCategory,
-        subcategoryId: selectedSubCategory,
-        keyword: searchQuery,
-      })
-        .then((response) => {
-          setProducts(response.data.list);
-          setTotalProducts(response.data.total_number);
-          setLoading(false);
-        })
-        .catch((err) => errorNotification('Не удалось получить данные', err.response?.status));
-    }, 1000);
-
-    return () => clearInterval(delayedSearch);
-  }, [currentPage, searchQuery, selectedCategory, selectedSubCategory, shouldRerender]);
-
-  const onDeleteProduct = (productId: number) => {
-    ProductsService.deleteProduct(productId)
-      .then(() => {
-        openNotification('Запись удалено!', '', 'success', 1.5);
-        setShouldRerender(!shouldRerender);
-      })
-      .catch((err) => errorNotification('Не удалось удалить данные', err.response?.status));
-  };
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const initialData = useRef<ProductsDtoResponse[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<number | undefined>(undefined);
+  const [providers, setProviders] = useState<ProviderDtoResponse[]>([]);
 
   const columns = [
-    {
-      title: 'Номер',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: 'Картинка',
-      dataIndex: 'mainPhoto',
-      key: 'mainPhoto',
-      render: (record: any) => (
-        <Space> {record ? <Image width={150} src={record}></Image> : <Tag color="error">Нет фото</Tag>}</Space>
-      ),
-    },
     {
       title: 'Наименование',
       dataIndex: 'title',
       key: 'title',
+    },
+    {
+      title: 'Описание',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
       title: 'Категория',
@@ -83,44 +39,91 @@ const useProductImport = () => {
       key: 'category',
     },
     {
+      title: 'Бренд',
+      dataIndex: 'brand',
+      key: 'brand',
+    },
+    {
       title: 'Цена',
       dataIndex: 'price',
       key: 'price',
       render: (record: any) => <> {record} ₸</>,
     },
-    // {
-    //   title: 'Статус',
-    //   dataIndex: 'isActive',
-    //   key: 'id',
-    //   render: (record: any) => (
-    //     <Space> {record ? <Tag color="success">Активен</Tag> : <Tag color="error">Неактивен</Tag>}</Space>
-    //   ),
-    //   width: '50',
-    // },
     {
-      title: 'Действия',
-      dataIndex: 'actions',
-      key: 'actions',
-      width: 120,
+      title: 'Категория',
+      dataIndex: 'category',
+      key: 'category',
+    },
+    {
+      title: 'Подкатегория',
+      dataIndex: 'subCategory',
+      key: 'subCategory',
+    },
+    {
+      title: 'Действие',
+      dataIndex: 'operation',
+      key: 'operation',
       render: (text: any, record: any) => (
-        <Space size="middle">
-          <Link to={`/products/edit/${record.key}`}>
-            <Button>
-              <EditTwoTone />
-            </Button>
-          </Link>
+        <Space>
+          <Button type="default" onClick={() => editProduct(record)}>
+            <EditOutlined />
+          </Button>
           <Popconfirm
             title="Вы уверены, что хотите удалить запись?"
-            onConfirm={() => onDeleteProduct(record.key)}
+            onConfirm={() => deleteRecord(record)}
             okText="Да"
             cancelText="Нет"
           >
             <Button type="default" danger>
-              <DeleteTwoTone twoToneColor="#ff0000" />
+              <DeleteOutlined />
             </Button>
           </Popconfirm>
         </Space>
       ),
+      width: '5%',
+    },
+  ];
+
+  const importColumns = [
+    {
+      title: 'Наименование',
+      dataIndex: 'title',
+      key: 'title',
+    },
+    {
+      title: 'Описание',
+      dataIndex: 'description',
+      key: 'description',
+    },
+    {
+      title: 'Категория',
+      dataIndex: 'category',
+      key: 'category',
+      render: (record: any) => <> {record?.title}</>,
+    },
+    {
+      title: 'Бренд',
+      dataIndex: 'brand',
+      key: 'brand',
+      render: (record: any) => <> {record?.name}</>,
+    },
+    {
+      title: 'Цена',
+      dataIndex: 'price',
+      key: 'price',
+      render: (record: any) => <> {record} ₸</>,
+    },
+    {
+      title: 'Категория',
+      dataIndex: 'category',
+      key: 'category',
+      render: (record: CategoriesDtoResponse) => <> {record?.title}</>,
+    },
+    {
+      title: 'Подкатегория',
+      dataIndex: 'subCategory',
+      key: 'subCategory',
+      render: (record: SubCategoriesDtoResponse) => <> {record?.title}</>,
     },
   ];
 
@@ -147,31 +150,104 @@ const useProductImport = () => {
     accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   };
 
+  useEffect(() => {
+    fetchCertificates();
+  }, []);
+
+  const fetchCertificates = () => {
+    setLoading(true);
+    ProvidersService.getAll()
+      .then(({ data }) => {
+        setProviders(data);
+      })
+      .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
+      .finally(() => setLoading(false));
+    // CertificateService.getAll()
+    //   .then(({ data }) => {
+    //     setData(data);
+    //     initialData.current = data;
+    //   })
+    //   .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
+    //   .finally(() => setLoading(false));
+  };
+
+  const deleteRecord = (record: any) => {
+    setLoading(true);
+    // CertificateService.deleteCertificate(record.id)
+    //   .then(({ data }) => notification.success({ message: 'Удалено' }))
+    //   .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
+    //   .finally(() => {
+    //     setLoading(false);
+    //     fetchCertificates();
+    //   });
+  };
+
+  const createCertificate = () => {
+    setCreateModalOpen(true);
+  };
+
+  const editProduct = (record: ProductsDtoResponse) => {
+    setEditModalOpen(true);
+    // CertificateService.getCertificateById(record.id)
+    //   .then(({ data }) => {
+    //     setEditData(data);
+    //   })
+    //   .catch((err) => errorNotification('Не удалось получить данные о сертификате', err.response?.status));
+  };
+
+  const closeModal = () => {
+    setEditModalOpen(false);
+    setCreateModalOpen(false);
+    setIsModalOpen(false);
+    // fetchCertificates();
+  };
+
+  // const searchByParameters = (e: string) => {
+  //   if (!e.length) setData(initialData.current);
+  //   else {
+  //     const resultsByName = data.filter((item) => item.issuedTo.toLowerCase().includes(e.toLowerCase()));
+  //     const resultsByCode = data.filter((item) => item.number.toLowerCase().includes(e.toLowerCase()));
+  //     setData([...resultsByCode, ...resultsByName]);
+  //   }
+  // };
+
+  const importFromExcelFile = () => {
+    setIsModalOpen(true);
+  };
+
+  const saveCertificateList = () => {
+    setLoading(true);
+    // CertificateService.saveCertificateList(importData!.data)
+    //   .then(({ data }) => successNotification('Данные успешно сохранены!'))
+    //   .catch((err) => errorNotification('Не удалось импортировать данные', err.response?.status))
+    //   .finally(() => setLoading(false));
+  };
+
   return {
-    shouldRerender,
-    setShouldRerender,
-    loading,
-    setLoading,
-    categories,
-    setCategories,
-    subCategories,
-    setSubCategories,
-    products,
-    setProducts,
-    totalProducts,
-    setTotalProducts,
-    currentPage,
-    setCurrentPage,
-    searchQuery,
-    setSearchQuery,
-    selectedCategory,
-    setSelectedCategory,
-    selectedSubCategory,
-    setSelectedSubCategory,
-    onDeleteProduct,
-    columns,
-    isModalOpen,
-    setIsModalOpen,
+    data: {
+      data,
+      props,
+      columns,
+      loading,
+      editModalOpen,
+      createModalOpen,
+      importColumns,
+      editData,
+      isModalOpen,
+      importData,
+      providers,
+      selectedProvider,
+    },
+    handlers: {
+      // searchByParameters,
+      closeModal,
+      editProduct,
+      confirm: deleteRecord,
+      createCertificate,
+      saveCertificateList,
+      importFromExcelFile,
+      setSelectedProvider,
+    },
   };
 };
 
