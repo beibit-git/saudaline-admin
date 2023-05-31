@@ -5,15 +5,12 @@ import { Constants } from '../common/constants';
 export class FileService {
   static baseURL = Constants.API_BASE_URL;
 
-  static importDataFromExcelFile(file: RcFile, providerId: number | undefined) {
+  static importDataFromExcelFile(file: RcFile) {
     const formData = new FormData();
     formData.append('excel', file);
     console.log(formData);
-    return authAxios.post(
-      `/api/v1/file/import-products?providerId=${providerId}
-        `,
-      formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    );
+    return authAxios.post(`/api/v1/file/import-products`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
   }
 }

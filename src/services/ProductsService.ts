@@ -52,4 +52,8 @@ export class ProductsService {
   static updateProductByAdmin(productId: number, updatedProduct: ProductDtoRequest) {
     return authAxios.put(`/api/v1/product/update-product-by-admin?productId=${productId}`, updatedProduct);
   }
+
+  static cancelSavingExcel(products: ProductsDtoResponse[]) {
+    return authAxios.post(`/api/v1/product/cancel-saving`, products);
+  }
 }

@@ -8,7 +8,7 @@ const ProductImport = () => {
   const { data, handlers } = useProductImport();
 
   return (
-    <Page title={'Регистрация сертификатов'}>
+    <Page title={'Импорт товаров'}>
       <Row style={{ marginBottom: 20 }}>
         <Col flex={0}>
           <Input
@@ -34,7 +34,13 @@ const ProductImport = () => {
         <EditCertificateModal open={data.editModalOpen} onCancel={handlers.closeModal} data={data.editData} />
       )}
       <CreateCertificateModal open={data.createModalOpen} onCancel={handlers.closeModal} /> */}
-      <Modal title={'Импорт'} open={data.isModalOpen} onCancel={handlers.closeModal} footer={null} width={1200}>
+      <Modal
+        title={'Импорт'}
+        open={data.isModalOpen}
+        onCancel={() => handlers.closeModal(data?.importData?.data)}
+        footer={null}
+        width={1200}
+      >
         <Row justify="center">
           <Col span={2}>
             <Typography.Text>Поставщик:</Typography.Text>{' '}
