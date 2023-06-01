@@ -53,7 +53,9 @@ export class ProductsService {
     return authAxios.put(`/api/v1/product/update-product-by-admin?productId=${productId}`, updatedProduct);
   }
 
-  static cancelSavingExcel(products: ProductsDtoResponse[]) {
-    return authAxios.post(`/api/v1/product/cancel-saving`, products);
+  static cancelSavingExcel(products: ProductsDtoResponse[] | undefined) {
+    if (products !== undefined) {
+      return authAxios.post(`/api/v1/product/cancel-saving`, products);
+    }
   }
 }

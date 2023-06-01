@@ -1,5 +1,5 @@
-import { DeleteOutlined, DownloadOutlined, EditOutlined, SearchOutlined } from '@ant-design/icons';
-import { Button, Form, Input, notification, Popconfirm, Space, Image, Tag, Typography, UploadProps } from 'antd';
+import { DeleteOutlined, DownloadOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Form, Input, notification, Popconfirm, Space, Image, Tag, UploadProps } from 'antd';
 import React, { useState, useEffect, useRef } from 'react';
 import { errorNotification } from '../../../helpers/errorNotification';
 import { successNotification } from '../../../helpers/successNotification';
@@ -212,6 +212,13 @@ const useProductImport = () => {
     //   .catch((err) => errorNotification('Не удалось получить данные о сертификате', err.response?.status));
   };
 
+  const handleCancel = () => {
+    if (importData?.data !== undefined && importData?.data !== null) {
+      ProductsService.cancelSavingExcel(importData?.data);
+    }
+    setImportData(undefined);
+  };
+
   const closeModal = (products: ProductsDtoResponse[] | undefined) => {
     setEditModalOpen(false);
     setCreateModalOpen(false);
@@ -269,6 +276,7 @@ const useProductImport = () => {
       saveCertificateList,
       importFromExcelFile,
       setSelectedProvider,
+      handleCancel,
     },
   };
 };
