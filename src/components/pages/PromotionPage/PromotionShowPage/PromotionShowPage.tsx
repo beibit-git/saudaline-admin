@@ -122,7 +122,7 @@ const PromotionShowPage = ({ promotionId }: Props) => {
                   xl: 108,
                   xxl: 108,
                 }}
-                src={record?.product?.mainPhoto[0]?.url}
+                src={record?.product?.mainPhoto?.url}
               />
               <ProductText>
                 <Text style={{ fontWeight: 700 }}>{record?.product?.title}</Text>

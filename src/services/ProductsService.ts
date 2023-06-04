@@ -58,4 +58,8 @@ export class ProductsService {
       return authAxios.post(`/api/v1/product/cancel-saving`, products);
     }
   }
+
+  static saveExcel(products: ProductsDtoResponse[], providerId: number) {
+    return authAxios.post(`/api/v1/product/save-products-from-excel?providerId=${providerId}`, products);
+  }
 }

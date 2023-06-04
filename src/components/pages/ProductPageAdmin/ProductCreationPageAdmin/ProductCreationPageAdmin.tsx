@@ -6,7 +6,6 @@ import PageWrapper from '../../../../ui/PageWrapper';
 import { CategoriesService } from '../../../../services/CategoriesService';
 import { CategoriesDtoResponse } from '../../../../interfaces/Categories/CategoriesDtoResponse';
 import BackButton from '../../../../ui/BackButton';
-import UserService from '../../../../services/userService';
 import { errorNotification } from '../../../../helpers/errorNotification';
 import { successNotification } from '../../../../helpers/successNotification';
 import { ProductsService } from '../../../../services/ProductsService';
@@ -18,6 +17,7 @@ import { SubCategoriesDtoResponse } from '../../../../interfaces/Categories/SubC
 import { Constants } from '../../../../common/constants';
 import { ProvidersService } from '../../../../services/ProvidersService';
 import { ProviderDtoResponse } from '../../../../interfaces/provider/ProviderDtoResponse';
+import { FileDtoRequest } from '../../../../interfaces/file/FileDtoRequest';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -43,12 +43,11 @@ const ProductCreationPageAdmin = ({ productId }: Props) => {
       setLoading(true);
       ProductsService.getOneProduct(productId)
         .then(({ data }) => {
-          console.log(data);
           form.setFieldsValue({
             title: data.title,
             description: data.description,
             brand: data.brand?.id,
-            mainPhoto: data.mainPhoto,
+            mainPhoto: data.mainPhoto ? [data.mainPhoto] : undefined,
             unitType: data.unitType,
             hits: data.hits,
             price: data.price,
@@ -154,7 +153,6 @@ const ProductCreationPageAdmin = ({ productId }: Props) => {
               className="avatar-uploader"
             >
               + Загрузить картинку
-              {/* <Button icon={<UploadOutlined />}></Button> */}
             </Upload>
           </Form.Item>
           <Form.Item

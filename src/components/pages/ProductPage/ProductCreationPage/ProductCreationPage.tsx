@@ -44,7 +44,7 @@ const ProductCreationPage = ({ productId }: Props) => {
             title: data.title,
             description: data.description,
             brand: data.brand.id,
-            mainPhoto: data.mainPhoto,
+            mainPhoto: data.mainPhoto ? [data.mainPhoto] : undefined,
             unitType: data.unitType,
             hits: data.hits,
             price: data.price,
@@ -145,7 +145,6 @@ const ProductCreationPage = ({ productId }: Props) => {
               className="avatar-uploader"
             >
               + Загрузить картинку
-              {/* <Button icon={<UploadOutlined />}></Button> */}
             </Upload>
           </Form.Item>
           <Form.Item

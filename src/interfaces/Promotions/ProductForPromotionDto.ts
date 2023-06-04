@@ -3,6 +3,6 @@ import { FileDto } from '../file/FileDto';
 export interface ProductForPromotionDto {
   id: number;
   title: string;
-  mainPhoto: FileDto[];
+  mainPhoto: FileDto;
   price: number;
 }

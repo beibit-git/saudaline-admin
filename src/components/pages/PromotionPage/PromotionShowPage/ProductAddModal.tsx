@@ -55,7 +55,7 @@ const ProductAddModal = ({ promotionId, openModal, productPromotionId, onClose }
             isActive: data.isActive,
             productDetails: data.product,
             product: data.product.id,
-            photo: data.product.mainPhoto[0].url,
+            photo: data.product.mainPhoto.url,
           });
         })
         .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))

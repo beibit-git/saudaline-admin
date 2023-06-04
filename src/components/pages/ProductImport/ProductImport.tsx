@@ -42,7 +42,7 @@ const ProductImport = () => {
                 <Button
                   type="primary"
                   size="large"
-                  onClick={handlers.saveCertificateList}
+                  onClick={handlers.saveProductList}
                   loading={data.loading}
                   icon={<SaveOutlined />}
                   disabled={!data.selectedProvider}
@@ -92,22 +92,6 @@ const ProductImport = () => {
         <EditCertificateModal open={data.editModalOpen} onCancel={handlers.closeModal} data={data.editData} />
       )}
       <CreateCertificateModal open={data.createModalOpen} onCancel={handlers.closeModal} /> */}
-      <Modal
-        title={'Импорт'}
-        open={data.isModalOpen}
-        onCancel={() => handlers.closeModal(data?.importData?.data)}
-        footer={null}
-        width={1200}
-      >
-        <Row justify="center">
-          <Col span={2}>
-            <Typography.Text>Поставщик:</Typography.Text>{' '}
-          </Col>
-          <Col span={6}></Col>
-        </Row>
-        <Divider plain></Divider>
-        <Row justify="center"></Row>
-      </Modal>
     </Page>
   );
 };

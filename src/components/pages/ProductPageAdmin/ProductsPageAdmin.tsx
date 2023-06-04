@@ -29,7 +29,7 @@ const ProductsPageAdmin = () => {
           id: product.id,
           key: product.id,
           title: `${product.title}`,
-          mainPhoto: product.mainPhoto[0].url,
+          mainPhoto: product.mainPhoto?.url,
           category: product.category.title,
           price: product.price,
           provider: product.provider.name,

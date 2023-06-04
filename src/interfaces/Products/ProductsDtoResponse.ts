@@ -10,7 +10,7 @@ export interface ProductsDtoResponse {
   title: string;
   description: string;
   brand: BrandsDtoResponse;
-  mainPhoto: FileDto[];
+  mainPhoto: FileDto;
   unitType: UnitTypeDtoResponse;
   hits: number;
   amount: number;

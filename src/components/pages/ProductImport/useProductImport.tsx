@@ -244,12 +244,12 @@ const useProductImport = () => {
     setIsModalOpen(true);
   };
 
-  const saveCertificateList = () => {
+  const saveProductList = () => {
     setLoading(true);
-    // CertificateService.saveCertificateList(importData!.data)
-    //   .then(({ data }) => successNotification('Данные успешно сохранены!'))
-    //   .catch((err) => errorNotification('Не удалось импортировать данные', err.response?.status))
-    //   .finally(() => setLoading(false));
+    ProductsService.saveExcel(importData!.data, selectedProvider!)
+      .then(({ data }) => successNotification('Данные успешно сохранены!'))
+      .catch((err) => errorNotification('Не удалось импортировать данные', err.response?.status))
+      .finally(() => setLoading(false));
   };
 
   return {
@@ -273,7 +273,7 @@ const useProductImport = () => {
       editProduct,
       confirm: deleteRecord,
       createCertificate,
-      saveCertificateList,
+      saveProductList,
       importFromExcelFile,
       setSelectedProvider,
       handleCancel,
