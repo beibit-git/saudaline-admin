@@ -5,11 +5,11 @@ import { CustomerDto } from './CustomerDto';
 export interface DeliveryDetailsDto {
   id: number;
   address: string;
-  city: CityResponseDto;
   comment: string;
   customer: CustomerDto;
   email: string;
   fio: string;
-  region: RegionDto;
   tel: string;
+  latitude: number;
+  longitude: number;
 }

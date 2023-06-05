@@ -28,6 +28,7 @@ import { OrdersService } from '../../../../services/OrdersService';
 import { OrderStatus } from '../OrderStatus/OrderStatus';
 import styles from './style.module.css';
 import { DateField } from '../../../../helpers/DateField';
+import { YMaps, Map, ZoomControl, Placemark } from '@pbe/react-yandex-maps';
 import {
   ContainerDetails,
   CourierBoxContainer,
@@ -55,6 +56,9 @@ const OrderShowPageAdmin = ({ orderId }: Props) => {
   const [order, setOrder] = useState<OrderDtoShow>();
   const { openNotification } = useNotification();
   const [loadings, setLoadings] = useState<boolean[]>([]);
+  const [center, setCenter] = useState([51.143974, 71.435806]);
+  const [zoom, setZoom] = useState(5);
+  const mapState = React.useMemo(() => ({ center, zoom, controls: [] }), [center, zoom]);
 
   // useEffect для страниц с редактированием дисциплины
   React.useEffect(() => {
@@ -63,6 +67,10 @@ const OrderShowPageAdmin = ({ orderId }: Props) => {
       OrdersService.getOneOrder(orderId)
         .then(({ data }) => {
           setOrder(data);
+          if (data.deliveryDetails?.latitude && data.deliveryDetails?.longitude) {
+            setCenter([data.deliveryDetails?.latitude, data.deliveryDetails?.longitude]);
+            setZoom(17);
+          }
         })
         .catch((err) => errorNotification('Не удалось получить данные', err.response?.status))
         .finally(() => setLoading(false));
@@ -275,9 +283,9 @@ const OrderShowPageAdmin = ({ orderId }: Props) => {
         <>
           <Card>
             <Row justify="space-between">
-              <Col xl={12} lg={12}>
+              <Col xl={16} lg={16} xs={24}>
                 <div className={styles.flexrow}>
-                  <Avatar size={108} src={order?.customer.logotype[0].url} />
+                  {order?.customer.logotype[0]?.url && <Avatar size={108} src={order?.customer.logotype[0]?.url} />}
                   <div className={styles.orderer}>
                     <Text style={{ fontSize: 16 }}>ЗАКАЗЧИК:</Text>
                     <Text
@@ -288,64 +296,35 @@ const OrderShowPageAdmin = ({ orderId }: Props) => {
                     >
                       {order?.customer.businessType.name} {order?.customer.name}
                     </Text>
-                    <Text>
-                      Дата: <DateField format="DD-MM-YYYY HH:mm" value={order.created.toString()} />
-                    </Text>
                   </div>
                 </div>
                 <Col>
                   <Text>
-                    <strong>ФИО заказчика:</strong> {order?.deliveryDetails.fio}
-                  </Text>
-                  <br />
-                  <Text>
-                    <strong>Телефон:</strong> {order?.deliveryDetails.tel}
-                  </Text>
-                  <br />
-                </Col>
-                <Col>
-                  <Text>
-                    <strong>Эл. почта:</strong> {order?.deliveryDetails.email}
-                  </Text>
-                  <br />
-                  <Text>
-                    <strong>Регион:</strong> {order?.deliveryDetails.region.nameRu}
-                    {'   '}
-                    <strong>Город:</strong>
-                    {order?.deliveryDetails.city.name}
-                  </Text>
-                  <br />
-                  <Text>
                     <strong>Адрес:</strong> {order?.deliveryDetails.address}
+                  </Text>
+                  <br />
+                  <Text>
+                    <strong>Дата заказа:</strong>{' '}
+                    <DateField format="DD-MM-YYYY HH:mm" value={order.created.toString()} />
+                  </Text>
+                  <br />
+                  <Text>
+                    {' '}
+                    <strong>Телефон:</strong> {order?.customer.phone}
                   </Text>
                 </Col>
               </Col>
-              <ContainerDetails xl={12} lg={12}>
-                <CourierBoxContainer xl={24} lg={24} md={24}>
-                  {courierInfoBox(
-                    'Телефон',
-                    <MobileOutlined style={{ color: '#ffff', fontSize: 32 }} />,
-                    order?.deliveryDetails.tel
-                  )}
-                  {courierInfoBox(
-                    'Адрес',
-                    <EnvironmentOutlined style={{ color: '#ffff', fontSize: 32 }} />,
-                    order?.deliveryDetails.address
-                  )}
-                </CourierBoxContainer>
-                <CourierBoxContainer xl={24} lg={24} md={24}>
-                  {courierInfoBox(
-                    'Дата заказа',
-                    <FieldTimeOutlined style={{ color: '#ffff', fontSize: 32 }} />,
-                    <DateField format="DD-MM-YYYY HH:mm" value={order.created.toString()} />
-                  )}
-                  {courierInfoBox(
-                    'Дата поставки',
-                    <FieldTimeOutlined style={{ color: '#ffff', fontSize: 32 }} />,
-                    <DateField format="DD-MM-YYYY HH:mm" value={order.created.toString()} />
-                  )}
-                </CourierBoxContainer>
-              </ContainerDetails>
+              <Col xl={8} lg={8} xs={24}>
+                Карта
+                <YMaps>
+                  <div>
+                    <Map state={mapState} height={350} width={'100%'}>
+                      <ZoomControl />
+                      {center && <Placemark geometry={center} />}
+                    </Map>
+                  </div>
+                </YMaps>
+              </Col>
             </Row>
           </Card>
         </>
